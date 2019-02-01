@@ -3,3 +3,9 @@
 
 # Ignore Gradle build output directory
 build
+
+/cache
+/logs
+/out
+/.idea
+
