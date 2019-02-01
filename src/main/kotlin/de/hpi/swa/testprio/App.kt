@@ -2,20 +2,27 @@ package de.hpi.swa.testprio
 
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
-import com.github.ajalt.clikt.parameters.options.*
+import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
-import de.hpi.swa.testprio.parser.*
-import de.hpi.swa.testprio.strategy.*
+import de.hpi.swa.testprio.parser.CsvOutput
+import de.hpi.swa.testprio.parser.LogParser
 import de.hpi.swa.testprio.strategy.RecentlyFailedStrategy
+import de.hpi.swa.testprio.strategy.LeastRecentlyUsedStrategy
+import de.hpi.swa.testprio.strategy.RandomStrategy
+import de.hpi.swa.testprio.strategy.StrategyRunner
 import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy
 import de.hpi.swa.testprio.strategy.UntreatedStrategy
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
-import org.jooq.impl.DSL.*
+import org.jooq.impl.DSL.table
+import org.jooq.impl.DSL.field
+import org.jooq.impl.DSL.name
 import org.jooq.impl.SQLDataType
 import org.postgresql.ds.PGSimpleDataSource
 import java.io.File
@@ -91,7 +98,6 @@ private class ParseToDb : DatabaseCommand() {
                 db.batch(statements).execute()
             }
         }
-
     }
 }
 
@@ -112,7 +118,7 @@ private class PrioritizeMatrix : PrioritizeCommand("matrix") {
     }
 }
 
-private class PrioritizeUntreated: PrioritizeCommand("untreated") {
+private class PrioritizeUntreated : PrioritizeCommand("untreated") {
 
     override fun run() {
         makeContext(readOnly = true).use {

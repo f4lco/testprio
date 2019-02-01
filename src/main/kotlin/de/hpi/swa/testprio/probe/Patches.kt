@@ -1,10 +1,11 @@
 package de.hpi.swa.testprio.probe
 
 import org.jooq.DSLContext
-import org.jooq.impl.DSL.*
+import org.jooq.impl.DSL.field
+import org.jooq.impl.DSL.name
+import org.jooq.impl.DSL.table
 
 object Patches {
-
 
     fun selectPatches(context: DSLContext, travisJobId: String): List<String> =
         context.selectDistinct(field(name("tr_patches", "filename")))

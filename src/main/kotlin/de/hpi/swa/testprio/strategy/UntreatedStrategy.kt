@@ -4,4 +4,3 @@ class UntreatedStrategy : PrioritisationStrategy {
 
     override fun apply(p: Params) = p.testResults
 }
-

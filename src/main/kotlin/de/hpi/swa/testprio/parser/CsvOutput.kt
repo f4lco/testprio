@@ -1,11 +1,8 @@
 package de.hpi.swa.testprio.parser
 
 import org.apache.commons.csv.CSVFormat
-import org.apache.commons.csv.CSVParser
 import org.apache.commons.csv.CSVPrinter
-import org.apache.commons.csv.CSVRecord
 import java.io.File
-import java.io.FileReader
 import java.io.FileWriter
 
 object CsvOutput {
@@ -53,7 +50,6 @@ object CsvOutput {
     private fun LogFile.printCsv(to: CSVPrinter) = with(to) {
         print(travisJobId)
     }
-
 
     private fun TestResult.Companion.printCsvHeader(to: CSVPrinter) = with(to) {
         print("testName")

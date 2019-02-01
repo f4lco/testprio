@@ -9,8 +9,6 @@ fun File.asTravisLogFile(): LogFile {
 
 fun LogFile.Companion.of(f: File) = fromFile(f)
 
-
-
 private fun fromFile(f: File): LogFile {
     val parts = f.name.removeSuffix(".log").split("_")
     return when (parts.size) {
@@ -18,7 +16,7 @@ private fun fromFile(f: File): LogFile {
         3 -> {
             val (buildNumber, commit, jobId) = parts
             LogFile(source = f,
-                    travisBuildNumber =  buildNumber.toLong(),
+                    travisBuildNumber = buildNumber.toLong(),
                     travisJobId = jobId.toLong(),
                     travisBuildId = null,
                     gitCommitId = commit)

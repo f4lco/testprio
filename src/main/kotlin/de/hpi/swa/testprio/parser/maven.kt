@@ -113,13 +113,17 @@ object MavenLogParser {
     }
 }
 
-data class TestCompleted(val duration: BigDecimal,
-                         val count: Int,
-                         val failures: Int,
-                         val errors: Int,
-                         val skipped: Int)
+data class TestCompleted(
+    val duration: BigDecimal,
+    val count: Int,
+    val failures: Int,
+    val errors: Int,
+    val skipped: Int
+)
 
-data class Section(val name: String,
-                   val content: String,
-                   val firstChar: Int,
-                   val lastChar: Int)
+data class Section(
+    val name: String,
+    val content: String,
+    val firstChar: Int,
+    val lastChar: Int
+)

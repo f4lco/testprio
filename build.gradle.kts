@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm").version("1.3.20")
     id("kotlinx-serialization").version("1.3.20")
     id("com.github.johnrengelman.shadow").version("4.0.4")
+    id("org.jlleitschuh.gradle.ktlint").version("7.0.0")
 }
 
 repositories {

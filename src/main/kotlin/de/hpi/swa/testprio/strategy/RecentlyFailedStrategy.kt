@@ -27,7 +27,6 @@ class RecentlyFailedStrategy(val alpha: Double) : PrioritisationStrategy {
         return p.testResults.sortedByDescending { priorities[it.name] }
     }
 
-
     private fun getValue(history: BitSet, p: Params): Double {
         var prob: Double = historyAt(history, 0)
         var currentIndex = 1

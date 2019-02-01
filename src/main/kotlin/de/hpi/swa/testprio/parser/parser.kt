@@ -2,8 +2,6 @@ package de.hpi.swa.testprio.parser
 
 import mu.KotlinLogging
 import java.io.File
-import java.lang.IllegalStateException
-import java.security.MessageDigest
 
 private val logger = KotlinLogging.logger {}
 

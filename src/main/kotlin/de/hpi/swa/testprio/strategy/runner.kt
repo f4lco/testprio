@@ -17,9 +17,11 @@ interface Params {
     val testResults: List<TestResult>
 }
 
-class DatabaseParams(context: DSLContext,
-                     override val jobId: String,
-                     override val jobIds: List<String>) : Params {
+class DatabaseParams(
+    context: DSLContext,
+    override val jobId: String,
+    override val jobIds: List<String>
+) : Params {
 
     override val changedFiles: List<String> by lazy { Patches.selectPatches(context, jobId) }
 
@@ -53,5 +55,4 @@ class StrategyRunner(val context: DSLContext) {
     }
 
     private fun ensureIndexed(tr: List<TestResult>) = tr.mapIndexed { index, t -> t.copy(index = index) }
-
 }

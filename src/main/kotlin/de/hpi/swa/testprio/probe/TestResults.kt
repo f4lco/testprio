@@ -22,6 +22,5 @@ object TestResults {
                                 errors = it["errors"] as Int,
                                 skipped = it["skipped"] as Int
                         )
-
                     }
 }

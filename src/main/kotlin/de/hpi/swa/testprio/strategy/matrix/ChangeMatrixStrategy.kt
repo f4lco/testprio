@@ -15,9 +15,11 @@ import org.jooq.DSLContext
  * Implement similarity search
  * have debug counter for common error situations (not resolved git commits etc)
  */
-class ChangeMatrixStrategy(val context: DSLContext,
-                           val windowSize: Int = 100,
-                           val cache: Cache) : PrioritisationStrategy {
+class ChangeMatrixStrategy(
+    val context: DSLContext,
+    val windowSize: Int = 100,
+    val cache: Cache
+) : PrioritisationStrategy {
 
     private fun matrixFor(jobId: String): Matrix {
         return cache.get(jobId, ::computeMatrix)
@@ -42,7 +44,6 @@ class ChangeMatrixStrategy(val context: DSLContext,
     @Serializable
     data class Matrix(val jobId: String, val matrix: Map<Key, Int>)
 
-
     @Serializable
     data class Key(val fileName: String, val testName: String)
 
@@ -55,7 +56,6 @@ class ChangeMatrixStrategy(val context: DSLContext,
             sumMatrix.matrix.filterKeys { key ->
                 key.testName == test.name && key.fileName in p.changedFiles
             }.values.sum()
-
         }
     }
 
