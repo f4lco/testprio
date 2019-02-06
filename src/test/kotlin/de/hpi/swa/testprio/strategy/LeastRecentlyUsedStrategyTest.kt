@@ -1,9 +1,10 @@
 package de.hpi.swa.testprio.strategy
 
-import assertTestOrder
+import hasTestOrder
 import newTestResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import strikt.api.expectThat
 
 class LeastRecentlyUsedStrategyTest {
 
@@ -19,9 +20,9 @@ class LeastRecentlyUsedStrategyTest {
         val job1 = TestParams("A")
         job1.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
 
-        val reordered = strategy.apply(job1)
+        val result = strategy.apply(job1)
 
-        assertTestOrder(reordered, "tc0", "tc1")
+        expectThat(result).hasTestOrder("tc0", "tc1")
     }
 
     @Test
@@ -33,9 +34,9 @@ class LeastRecentlyUsedStrategyTest {
         job2.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
 
         strategy.apply(job1)
-        val reordered = strategy.apply(job2)
+        val result = strategy.apply(job2)
 
-        assertTestOrder(reordered, "tc1", "tc0")
+        expectThat(result).hasTestOrder("tc1", "tc0")
     }
 
     @Test
@@ -47,9 +48,9 @@ class LeastRecentlyUsedStrategyTest {
         job2.testResults = listOf("tc0", "tc1", "addedTC").map { newTestResult(it) }
 
         strategy.apply(job1)
-        val reordered = strategy.apply(job2)
+        val result = strategy.apply(job2)
 
-        assertTestOrder(reordered, "addedTC", "tc1", "tc0")
+        expectThat(result).hasTestOrder("addedTC", "tc1", "tc0")
     }
 
     @Test
@@ -61,8 +62,8 @@ class LeastRecentlyUsedStrategyTest {
         job2.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
 
         strategy.apply(job1)
-        val reordered = strategy.apply(job2)
+        val result = strategy.apply(job2)
 
-        assertTestOrder(reordered, "tc1", "tc0")
+        expectThat(result).hasTestOrder("tc1", "tc0")
     }
 }

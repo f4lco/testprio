@@ -26,7 +26,7 @@ dependencies {
     implementation("org.tinylog:tinylog:1.3.5")
     implementation("org.tinylog:slf4j-binding:1.3.5")
 
-    testImplementation("com.winterbe:expekt:0.5.0")
+    testImplementation("io.strikt:strikt-core:0.17.2")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.2")
 }

@@ -1,6 +1,8 @@
 
 import de.hpi.swa.testprio.parser.TestResult
-import com.winterbe.expekt.should
+import strikt.api.Assertion
+import strikt.assertions.containsExactly
+import strikt.assertions.map
 
 fun newTestResult(name: String, index: Int = 0, failures: Int = 0) = TestResult(
         name = name,
@@ -12,7 +14,9 @@ fun newTestResult(name: String, index: Int = 0, failures: Int = 0) = TestResult(
         skipped = 0
 )
 
-fun assertTestOrder(actual: List<TestResult>, vararg names: String) {
-    val actualNames = actual.map { it.name }
-    actualNames.should.equal(names.toList())
-}
+fun <T : Iterable<TestResult>> Assertion.Builder<T>.hasTestOrder(vararg names: String) =
+            compose("has test order ${names.joinToString(" ➟ ")}") {
+                map(TestResult::name).containsExactly(names.toList())
+            } then {
+                if (allPassed) pass() else fail()
+            }
