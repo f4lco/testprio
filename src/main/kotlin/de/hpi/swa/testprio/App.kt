@@ -61,11 +61,12 @@ private open class PrioritizeCommand(name: String?) : DatabaseCommand(name = nam
 
 private class PrioritizeMatrix : PrioritizeCommand("matrix") {
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
+    val windowSize by option("--window").int().default(100)
 
     override fun run() {
         makeContext().use {
             val cache = Cache(cacheDirectory)
-            val strategy = ChangeMatrixStrategy(it, cache = cache)
+            val strategy = ChangeMatrixStrategy(it, cache = cache, windowSize = windowSize)
             StrategyRunner(it).run(projectName, strategy, output)
         }
     }
