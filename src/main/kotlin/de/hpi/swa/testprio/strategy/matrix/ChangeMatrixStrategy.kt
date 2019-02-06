@@ -8,7 +8,6 @@ import kotlinx.serialization.Serializable
 
 /**
  * FIXME
- * Add test
  * Implement devaluation of prior results in reducer
  * Implement similarity search
  * have debug counter for common error situations (not resolved git commits etc)
