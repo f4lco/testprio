@@ -11,6 +11,7 @@ import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import de.hpi.swa.testprio.parser.CsvOutput
 import de.hpi.swa.testprio.parser.LogParser
+import de.hpi.swa.testprio.probe.DatabaseRepository
 import de.hpi.swa.testprio.strategy.RecentlyFailedStrategy
 import de.hpi.swa.testprio.strategy.LeastRecentlyUsedStrategy
 import de.hpi.swa.testprio.strategy.RandomStrategy
@@ -65,8 +66,9 @@ private class PrioritizeMatrix : PrioritizeCommand("matrix") {
 
     override fun run() {
         makeContext().use {
+            val repository = DatabaseRepository(it)
             val cache = Cache(cacheDirectory)
-            val strategy = ChangeMatrixStrategy(it, cache = cache, windowSize = windowSize)
+            val strategy = ChangeMatrixStrategy(repository, cache, windowSize = windowSize)
             StrategyRunner(it).run(projectName, strategy, output)
         }
     }

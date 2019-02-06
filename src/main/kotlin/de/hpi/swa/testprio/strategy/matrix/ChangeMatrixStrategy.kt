@@ -1,12 +1,10 @@
 package de.hpi.swa.testprio.strategy.matrix
 
 import de.hpi.swa.testprio.parser.TestResult
-import de.hpi.swa.testprio.probe.Patches
-import de.hpi.swa.testprio.probe.TestResults
+import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
 import kotlinx.serialization.Serializable
-import org.jooq.DSLContext
 
 /**
  * FIXME
@@ -16,9 +14,9 @@ import org.jooq.DSLContext
  * have debug counter for common error situations (not resolved git commits etc)
  */
 class ChangeMatrixStrategy(
-    val context: DSLContext,
-    val windowSize: Int = 100,
-    val cache: Cache
+    val repository: Repository,
+    val cache: Cache,
+    val windowSize: Int = 100
 ) : PrioritisationStrategy {
 
     private fun matrixFor(jobId: String): Matrix {
@@ -26,8 +24,8 @@ class ChangeMatrixStrategy(
     }
 
     private fun computeMatrix(jobId: String): Matrix {
-        val changedFiles = Patches.selectPatches(context, jobId)
-        val testResults = TestResults.ofJob(context, jobId)
+        val changedFiles = repository.changedFiles(jobId)
+        val testResults = repository.testResults(jobId)
         return createUnitMatrix(jobId, changedFiles, testResults)
     }
 
