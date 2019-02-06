@@ -4,6 +4,7 @@ import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.core.subcommands
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.default
+import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.file
@@ -29,7 +30,7 @@ private open class DatabaseCommand(name: String? = null) : CliktCommand(name = n
     val port by option("--port").int().default(5432)
     val db by option("--db").default("github")
     val user by option("--user")
-    val password by option("--password")
+    val password by option("--password").prompt("Password", hideInput = true)
 
     override fun run() = Unit
 
