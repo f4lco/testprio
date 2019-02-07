@@ -6,11 +6,14 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.prompt
 import com.github.ajalt.clikt.parameters.options.required
+import com.github.ajalt.clikt.parameters.types.choice
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
+import de.hpi.swa.testprio.parser.BuckParser
 import de.hpi.swa.testprio.parser.CsvOutput
 import de.hpi.swa.testprio.parser.LogParser
+import de.hpi.swa.testprio.parser.MavenLogParser
 import de.hpi.swa.testprio.probe.DatabaseRepository
 import de.hpi.swa.testprio.strategy.RecentlyFailedStrategy
 import de.hpi.swa.testprio.strategy.LeastRecentlyUsedStrategy
@@ -47,10 +50,17 @@ private open class DatabaseCommand(name: String? = null) : CliktCommand(name = n
 
 private class Parse : CliktCommand() {
     val logs by option("-l", "--logs").file(exists = true, readable = true).required()
-    val output: File by option("-o", "--output").file(exists = false).required()
+    val output by option("-o", "--output").file(exists = false).required()
+    val type by option("-t", "--type").choice("maven", "buck").default("maven")
 
     override fun run() {
-        val parseResult = LogParser.parseLog(logs)
+        val parser = when (type) {
+            "maven" -> MavenLogParser
+            "buck" -> BuckParser
+            else -> throw IllegalArgumentException(type)
+        }
+
+        val parseResult = LogParser(parser).parseLog(logs)
         CsvOutput.write(parseResult, output)
     }
 }

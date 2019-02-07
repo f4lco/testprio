@@ -5,7 +5,12 @@ import java.io.File
 
 private val logger = KotlinLogging.logger {}
 
-object LogParser {
+interface Parser {
+
+    fun parseFile(logFile: LogFile): Sequence<TestResult>
+}
+
+class LogParser(private val parser: Parser) {
 
     fun parseLog(logPath: File) =
             if (logPath.isDirectory) parseLogDirectory(logPath)
@@ -15,7 +20,7 @@ object LogParser {
 
     private fun parseLogFile(logFile: LogFile): ParseResult {
         logger.info("Processing {}", logFile.source.name)
-        val testResults = MavenLogParser.parseFile(logFile)
+        val testResults = parser.parseFile(logFile)
         return ParseResult(logFile, testResults.toList())
     }
 

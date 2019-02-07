@@ -22,7 +22,7 @@ private val logger = KotlinLogging.logger {}
  * - Find all test announcement and completion events for that section, and "zip". Assume that the
  *   test case which was first announced will be also the first to complete.
  */
-object MavenLogParser {
+object MavenLogParser : Parser {
 
     private val moduleBannerPattern = "^\\[INFO] Building (.*?)\$\\s+\\[INFO] -{72}\$".toRegex(RegexOption.MULTILINE)
 
@@ -30,7 +30,7 @@ object MavenLogParser {
 
     private val testResultPattern = "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+), Time elapsed: (.+?) sec".toRegex()
 
-    fun parseFile(logFile: LogFile): Sequence<TestResult> {
+    override fun parseFile(logFile: LogFile): Sequence<TestResult> {
         val content = logFile.source.readText()
         return splitSections(content).flatMap(::testResultFromSection).mapIndexed { index, item ->
             item.copy(index = index)
