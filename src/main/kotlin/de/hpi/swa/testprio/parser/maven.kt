@@ -104,7 +104,7 @@ object MavenLogParser {
 
     private fun newTestCompleted(m: MatchResult): TestCompleted {
         val (count, failures, errors, skipped, duration) = m.destructured
-        return TestCompleted(duration = duration.toBigDecimal(),
+        return TestCompleted(duration = duration.replace(",", "").toBigDecimal(),
                 count = count.toInt(),
                 failures = failures.toInt(),
                 errors = errors.toInt(),
