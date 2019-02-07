@@ -1,0 +1,7 @@
+# Example configuration for executing test prioritisation
+
+# Database password
+export PRIO_PW=""
+
+# Path to JAR
+export PRIO_JAR="testprio.jar"

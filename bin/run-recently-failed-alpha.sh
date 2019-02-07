@@ -1,12 +1,13 @@
 #!/bin/bash
+source .testprio
 
-seq 0 0.1 1 | xargs -t -Ialpha java -jar build/libs/testprio.jar \
+seq 0 0.1 1 | xargs -t -Ivalue java -jar $PRIO_JAR \
   recently-failed \
   --host localhost \
-  --port 4242 \
+  --port 5432 \
   --user ma \
   --db github \
   --project "square/okhttp" \
-  --alpha alpha \
-  --output square-okhttp-recently-failed-alpha.csv
+  --alpha value \
+  --output square-okhttp-recently-failed-value.csv
 

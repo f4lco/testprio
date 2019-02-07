@@ -9,3 +9,6 @@ build
 /out
 /.idea
 
+# Exclude toplevel, currently used configuration file
+# Documented template resides in bin/.testprio
+/.testprio

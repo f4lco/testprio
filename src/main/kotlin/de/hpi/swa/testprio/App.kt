@@ -31,7 +31,7 @@ private open class DatabaseCommand(name: String? = null) : CliktCommand(name = n
     val port by option("--port").int().default(5432)
     val db by option("--db").default("github")
     val user by option("--user")
-    val password by option("--password").prompt("Password", hideInput = true)
+    val password by option("--password", envvar = "PRIO_PW").prompt("Password", hideInput = true)
 
     override fun run() = Unit
 
