@@ -29,7 +29,10 @@ import org.jooq.impl.DSL
 import org.postgresql.ds.PGSimpleDataSource
 import java.io.File
 
-private open class DatabaseCommand(name: String? = null) : CliktCommand(name = name) {
+private open class DatabaseCommand(
+    name: String? = null,
+    help: String = ""
+) : CliktCommand(name = name, help = help) {
 
     val host by option("--host").default("localhost")
     val port by option("--port").int().default(5432)
@@ -49,7 +52,7 @@ private open class DatabaseCommand(name: String? = null) : CliktCommand(name = n
     }
 }
 
-private class Parse : CliktCommand() {
+private class Parse : CliktCommand(help = "Parse test results from build log files") {
     val logs by option("-l", "--logs").file(exists = true, readable = true).required()
     val output by option("-o", "--output").file(exists = false).required()
     val type by option("-t", "--type").choice("maven", "buck").default("maven")
@@ -65,12 +68,15 @@ private class Parse : CliktCommand() {
     }
 }
 
-private open class PrioritizeCommand(name: String?) : DatabaseCommand(name = name) {
+private open class PrioritizeCommand(name: String?, help: String = "") : DatabaseCommand(name = name, help = help) {
     val projectName by option("--project").required()
     val output by option("--output").file(exists = false, folderOkay = false).required()
 }
 
-private class PrioritizeMatrix : PrioritizeCommand("matrix") {
+private class PrioritizeMatrix : PrioritizeCommand(
+        name = "matrix",
+        help = "Prioritize using counting matrix") {
+
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
     val windowSize by option("--window").int().default(100)
     val alpha by option("--alpha").double().default(0.8)
@@ -90,7 +96,10 @@ private class PrioritizeMatrix : PrioritizeCommand("matrix") {
     }
 }
 
-private class PrioritizeSimilarityMatrix : PrioritizeCommand("simimatrix") {
+private class PrioritizeSimilarityMatrix : PrioritizeCommand(
+        name = "simimatrix",
+        help = "Prioritize using similarity matrix") {
+
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
     val alpha by option("--alpha").double().default(0.8)
 
@@ -108,7 +117,9 @@ private class PrioritizeSimilarityMatrix : PrioritizeCommand("simimatrix") {
     }
 }
 
-private class PrioritizeUntreated : PrioritizeCommand("untreated") {
+private class PrioritizeUntreated : PrioritizeCommand(
+        name = "untreated",
+        help = "Output the untreated test order") {
 
     override fun run() {
         makeContext().use {
@@ -117,7 +128,10 @@ private class PrioritizeUntreated : PrioritizeCommand("untreated") {
     }
 }
 
-private class PrioritizeRecentlyFailed : PrioritizeCommand("recently-failed") {
+private class PrioritizeRecentlyFailed : PrioritizeCommand(
+        name = "recently-failed",
+        help = "Prioritize recently failed test cases") {
+
     val alpha by option("--alpha").double().default(0.8)
 
     override fun run() {
@@ -127,7 +141,9 @@ private class PrioritizeRecentlyFailed : PrioritizeCommand("recently-failed") {
     }
 }
 
-private class PrioritizeLRU : PrioritizeCommand("lru") {
+private class PrioritizeLRU : PrioritizeCommand(
+        name = "lru",
+        help = "Prioritize tests which run late in the build process") {
 
     override fun run() {
         makeContext().use {
@@ -136,7 +152,7 @@ private class PrioritizeLRU : PrioritizeCommand("lru") {
     }
 }
 
-private class PrioritizeRandom : PrioritizeCommand("random") {
+private class PrioritizeRandom : PrioritizeCommand(name = "random", help = "Randomize test order") {
     val seed by option("--seed").int().default(42)
 
     override fun run() {
