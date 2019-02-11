@@ -11,7 +11,6 @@ import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.file
 import com.github.ajalt.clikt.parameters.types.int
 import de.hpi.swa.testprio.parser.BuckParser
-import de.hpi.swa.testprio.parser.CsvOutput
 import de.hpi.swa.testprio.parser.LogParser
 import de.hpi.swa.testprio.parser.MavenLogParser
 import de.hpi.swa.testprio.probe.DatabaseRepository
@@ -61,8 +60,7 @@ private class Parse : CliktCommand() {
             else -> throw IllegalArgumentException(type)
         }
 
-        val parseResult = LogParser(parser).parseLog(logs)
-        CsvOutput.write(parseResult, output)
+        LogParser(parser).parseLog(logs, output)
     }
 }
 

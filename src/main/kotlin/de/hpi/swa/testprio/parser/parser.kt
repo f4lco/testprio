@@ -1,5 +1,6 @@
 package de.hpi.swa.testprio.parser
 
+import me.tongfei.progressbar.ProgressBar
 import mu.KotlinLogging
 import java.io.File
 
@@ -12,11 +13,20 @@ interface Parser {
 
 class LogParser(private val parser: Parser) {
 
-    fun parseLog(logPath: File) =
-            if (logPath.isDirectory) parseLogDirectory(logPath)
-            else sequenceOf(parseLogFile(LogFile.of(logPath)))
+    fun parseLog(logPath: File, to: File) {
+        val files = if (logPath.isDirectory) logFilesOf(logPath)
+        else listOf(LogFile.of(logPath))
 
-    private fun parseLogDirectory(logPath: File) = logFilesOf(logPath).map { parseLogFile(it) }
+        ProgressBar("Files", files.size.toLong()).use { bar ->
+            val results = files.asSequence().map {
+                val result = parseLogFile(it)
+                bar.step()
+                result
+            }
+
+            CsvOutput.write(results, to)
+        }
+    }
 
     private fun parseLogFile(logFile: LogFile): ParseResult {
         logger.info("Processing {}", logFile.source.name)
@@ -32,7 +42,7 @@ class LogParser(private val parser: Parser) {
      * naming conventions.
      *
      */
-    private fun logFilesOf(path: File): Sequence<LogFile> = path.listFiles { pathName: File ->
+    private fun logFilesOf(path: File): List<LogFile> = path.listFiles { pathName: File ->
         pathName.name.endsWith(".log")
-    }.map { LogFile.of(it) }.distinctBy { it.travisJobId }.asSequence()
+    }.map { LogFile.of(it) }.distinctBy { it.travisJobId }
 }
