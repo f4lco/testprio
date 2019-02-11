@@ -53,6 +53,8 @@ object MavenLogParser : Parser {
                     name,
                     log.substring(firstChar, lastChar),
                     firstChar, lastChar)
+        }.ifEmpty {
+            sequenceOf(Section("Main", log, 0, log.length))
         }
     }
 
