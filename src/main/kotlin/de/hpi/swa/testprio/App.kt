@@ -22,6 +22,7 @@ import de.hpi.swa.testprio.strategy.StrategyRunner
 import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy
 import de.hpi.swa.testprio.strategy.UntreatedStrategy
+import de.hpi.swa.testprio.strategy.matrix.DevaluationReducer
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
 import org.jooq.impl.DSL
@@ -73,12 +74,18 @@ private open class PrioritizeCommand(name: String?) : DatabaseCommand(name = nam
 private class PrioritizeMatrix : PrioritizeCommand("matrix") {
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
     val windowSize by option("--window").int().default(100)
+    val alpha by option("--alpha").double().default(0.8)
 
     override fun run() {
         makeContext().use {
             val repository = DatabaseRepository(it)
             val cache = Cache(cacheDirectory)
-            val strategy = ChangeMatrixStrategy(repository, cache, windowSize = windowSize)
+            val strategy = ChangeMatrixStrategy(
+                    repository,
+                    cache,
+                    DevaluationReducer(alpha),
+                    windowSize)
+
             StrategyRunner(it).run(projectName, strategy, output)
         }
     }

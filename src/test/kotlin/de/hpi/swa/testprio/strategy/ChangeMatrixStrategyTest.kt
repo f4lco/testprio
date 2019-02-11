@@ -2,6 +2,7 @@ package de.hpi.swa.testprio.strategy
 
 import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy
+import de.hpi.swa.testprio.strategy.matrix.CountingReducer
 import hasTestOrder
 import newTestResult
 import org.junit.jupiter.api.AfterEach
@@ -29,7 +30,7 @@ class ChangeMatrixStrategyTest {
     fun setUp() {
         cache = Files.createTempDirectory(ChangeMatrixStrategy::class.simpleName).toFile()
         repo = TestRepository()
-        strategy = ChangeMatrixStrategy(repo, Cache(cache))
+        strategy = ChangeMatrixStrategy(repo, Cache(cache), CountingReducer)
     }
 
     @AfterEach

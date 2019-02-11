@@ -1,6 +1,5 @@
 package de.hpi.swa.testprio.strategy.matrix
 
-import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy.Matrix
 import java.io.File
 
 class Cache(val directory: File) {
