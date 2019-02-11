@@ -27,8 +27,8 @@ dependencies {
     implementation("org.tinylog:slf4j-binding:1.3.5")
 
     testImplementation("io.strikt:strikt-core:0.17.2")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.3.2")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.3.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.4.0")
 }
 
 val shadowJar by tasks.getting(ShadowJar::class) {
