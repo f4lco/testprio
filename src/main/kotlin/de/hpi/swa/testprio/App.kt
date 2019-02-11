@@ -21,6 +21,7 @@ import de.hpi.swa.testprio.strategy.StrategyRunner
 import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy
 import de.hpi.swa.testprio.strategy.UntreatedStrategy
+import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.DevaluationReducer
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
@@ -89,6 +90,24 @@ private class PrioritizeMatrix : PrioritizeCommand("matrix") {
     }
 }
 
+private class PrioritizeSimilarityMatrix : PrioritizeCommand("simimatrix") {
+    val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
+    val alpha by option("--alpha").double().default(0.8)
+
+    override fun run() {
+        makeContext().use {
+            val repository = DatabaseRepository(it)
+            val cache = Cache(cacheDirectory)
+            val strategy = ChangeMatrixSimilarityStrategy(
+                    repository,
+                    cache,
+                    DevaluationReducer(alpha))
+
+            StrategyRunner(it).run(projectName, strategy, output)
+        }
+    }
+}
+
 private class PrioritizeUntreated : PrioritizeCommand("untreated") {
 
     override fun run() {
@@ -137,4 +156,5 @@ fun main(args: Array<String>) = EntryPoint().subcommands(
         PrioritizeLRU(),
         PrioritizeRecentlyFailed(),
         PrioritizeMatrix(),
+        PrioritizeSimilarityMatrix(),
         PrioritizeUntreated()).main(args)
