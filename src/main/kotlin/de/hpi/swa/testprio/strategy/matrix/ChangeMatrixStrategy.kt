@@ -4,38 +4,7 @@ import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
-import kotlinx.serialization.Serializable
-import kotlin.math.roundToInt
 
-@Serializable
-data class Matrix(val jobId: String, val matrix: Map<Key, Int>)
-
-@Serializable
-data class Key(val fileName: String, val testName: String)
-
-internal typealias Reducer = (Matrix, Matrix) -> Matrix
-
-object CountingReducer : Reducer {
-    override fun invoke(left: Matrix, right: Matrix) =
-            Matrix(right.jobId, (left.matrix.keys + right.matrix.keys).associateWith {
-                (left.matrix[it] ?: 0) + (right.matrix[it] ?: 0)
-            })
-}
-
-class DevaluationReducer(val alpha: Double) : Reducer {
-
-    override fun invoke(left: Matrix, right: Matrix) =
-        Matrix(right.jobId, (left.matrix.keys + right.matrix.keys).associateWith {
-            (alpha * (left.matrix[it] ?: 0)).roundToInt() + (right.matrix[it] ?: 0)
-        })
-}
-
-/**
- * FIXME
- * Implement devaluation of prior results in reducer
- * Implement similarity search
- * have debug counter for common error situations (not resolved git commits etc)
- */
 class ChangeMatrixStrategy(
     val repository: Repository,
     val cache: Cache,
