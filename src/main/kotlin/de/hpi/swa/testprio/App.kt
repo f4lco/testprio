@@ -91,7 +91,7 @@ private class PrioritizeMatrix : PrioritizeCommand(
                     DevaluationReducer(alpha),
                     windowSize)
 
-            StrategyRunner(it).run(projectName, strategy, output)
+            StrategyRunner(repository).run(projectName, strategy, output)
         }
     }
 }
@@ -112,7 +112,7 @@ private class PrioritizeSimilarityMatrix : PrioritizeCommand(
                     cache,
                     DevaluationReducer(alpha))
 
-            StrategyRunner(it).run(projectName, strategy, output)
+            StrategyRunner(repository).run(projectName, strategy, output)
         }
     }
 }
@@ -123,7 +123,8 @@ private class PrioritizeUntreated : PrioritizeCommand(
 
     override fun run() {
         makeContext().use {
-            StrategyRunner(it).run(projectName, UntreatedStrategy(), output)
+            val repository = DatabaseRepository(it)
+            StrategyRunner(repository).run(projectName, UntreatedStrategy(), output)
         }
     }
 }
@@ -136,7 +137,8 @@ private class PrioritizeRecentlyFailed : PrioritizeCommand(
 
     override fun run() {
         makeContext().use {
-            StrategyRunner(it).run(projectName, RecentlyFailedStrategy(alpha), output)
+            val repository = DatabaseRepository(it)
+            StrategyRunner(repository).run(projectName, RecentlyFailedStrategy(alpha), output)
         }
     }
 }
@@ -147,7 +149,8 @@ private class PrioritizeLRU : PrioritizeCommand(
 
     override fun run() {
         makeContext().use {
-            StrategyRunner(it).run(projectName, LeastRecentlyUsedStrategy(), output)
+            val repository = DatabaseRepository(it)
+            StrategyRunner(repository).run(projectName, LeastRecentlyUsedStrategy(), output)
         }
     }
 }
@@ -157,7 +160,8 @@ private class PrioritizeRandom : PrioritizeCommand(name = "random", help = "Rand
 
     override fun run() {
         makeContext().use {
-            StrategyRunner(it).run(projectName, RandomStrategy(seed), output)
+            val repository = DatabaseRepository(it)
+            StrategyRunner(repository).run(projectName, RandomStrategy(seed), output)
         }
     }
 }

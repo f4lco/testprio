@@ -9,6 +9,8 @@ class TestRepository : Repository {
 
     val testResults = mutableMapOf<String, List<TestResult>>()
 
+    override fun redJobIdsOf(projectName: String) = (changedFiles.keys + testResults.keys).toList().sorted()
+
     override fun changedFiles(jobId: String) = changedFiles[jobId] ?: emptyList()
 
     override fun testResults(jobId: String) = testResults[jobId] ?: emptyList()

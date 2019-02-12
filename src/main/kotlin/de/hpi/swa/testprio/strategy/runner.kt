@@ -2,32 +2,21 @@ package de.hpi.swa.testprio.strategy
 
 import de.hpi.swa.testprio.parser.CsvOutput
 import de.hpi.swa.testprio.parser.TestResult
-import de.hpi.swa.testprio.probe.Patches
-import de.hpi.swa.testprio.probe.Projects
-import de.hpi.swa.testprio.probe.TestResults
+import de.hpi.swa.testprio.probe.Repository
 import me.tongfei.progressbar.ProgressBar
-import org.jooq.DSLContext
 import java.io.File
 
-interface Params {
-    val jobId: String
-    val jobIds: List<String>
-    val jobIndex: Int
-    val changedFiles: List<String>
-    val testResults: List<TestResult>
-}
+class Params(
+    val jobId: String,
+    val jobIds: List<String>,
+    val repository: Repository
+) {
 
-class DatabaseParams(
-    context: DSLContext,
-    override val jobId: String,
-    override val jobIds: List<String>
-) : Params {
+    val changedFiles: List<String> by lazy { repository.changedFiles(jobId) }
 
-    override val changedFiles: List<String> by lazy { Patches.selectPatches(context, jobId) }
+    val testResults: List<TestResult> by lazy { repository.testResults(jobId) }
 
-    override val testResults: List<TestResult> by lazy { TestResults.ofJob(context, jobId) }
-
-    override val jobIndex by lazy { jobIds.indexOf(jobId) }
+    val jobIndex by lazy { jobIds.indexOf(jobId) }
 }
 
 interface PrioritisationStrategy {
@@ -35,10 +24,10 @@ interface PrioritisationStrategy {
     fun apply(p: Params): List<TestResult>
 }
 
-class StrategyRunner(val context: DSLContext) {
+class StrategyRunner(val repository: Repository) {
 
     fun run(projectName: String, strategy: PrioritisationStrategy, output: File) {
-        val jobIds = Projects.redJobIdsOf(context, projectName)
+        val jobIds = repository.redJobIdsOf(projectName)
         ProgressBar("Jobs", jobIds.size.toLong()).use {
             val results = jobIds.asSequence().map { jobId ->
                 val results = processJob(jobId, jobIds, strategy)
@@ -50,7 +39,7 @@ class StrategyRunner(val context: DSLContext) {
     }
 
     private fun processJob(jobId: String, jobIds: List<String>, strategy: PrioritisationStrategy): List<TestResult> {
-        val params = DatabaseParams(context, jobId, jobIds)
+        val params = Params(jobId, jobIds, repository)
         return ensureIndexed(strategy.apply(params))
     }
 

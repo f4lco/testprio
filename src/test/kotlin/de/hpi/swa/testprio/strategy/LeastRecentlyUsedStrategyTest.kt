@@ -9,16 +9,18 @@ import strikt.api.expectThat
 class LeastRecentlyUsedStrategyTest {
 
     private lateinit var strategy: LeastRecentlyUsedStrategy
+    private lateinit var repository: TestRepository
 
     @BeforeEach
     fun setUp() {
         strategy = LeastRecentlyUsedStrategy()
+        repository = TestRepository()
     }
 
     @Test
     fun `first iteration leaves ordered unchanged`() {
-        val job1 = TestParams("A")
-        job1.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
+        repository.testResults["A"] = listOf("tc0", "tc1").map { newTestResult(it) }
+        val job1 = Params("A", listOf(), repository)
 
         val result = strategy.apply(job1)
 
@@ -27,11 +29,11 @@ class LeastRecentlyUsedStrategyTest {
 
     @Test
     fun `second iteration demotes the first test of the prior run`() {
-        val job1 = TestParams("A")
-        job1.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
+        repository.testResults["A"] = listOf("tc0", "tc1").map { newTestResult(it) }
+        val job1 = Params("A", emptyList(), repository)
 
-        val job2 = TestParams("B")
-        job2.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
+        repository.testResults["B"] = listOf("tc0", "tc1").map { newTestResult(it) }
+        val job2 = Params("B", emptyList(), repository)
 
         strategy.apply(job1)
         val result = strategy.apply(job2)
@@ -41,11 +43,11 @@ class LeastRecentlyUsedStrategyTest {
 
     @Test
     fun `added test cases are executed first`() {
-        val job1 = TestParams("A")
-        job1.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
+        repository.testResults["A"] = listOf("tc0", "tc1").map { newTestResult(it) }
+        val job1 = Params("A", emptyList(), repository)
 
-        val job2 = TestParams("B")
-        job2.testResults = listOf("tc0", "tc1", "addedTC").map { newTestResult(it) }
+        repository.testResults["B"] = listOf("tc0", "tc1", "addedTC").map { newTestResult(it) }
+        val job2 = Params("B", emptyList(), repository)
 
         strategy.apply(job1)
         val result = strategy.apply(job2)
@@ -55,11 +57,11 @@ class LeastRecentlyUsedStrategyTest {
 
     @Test
     fun `removed test cases are ignored`() {
-        val job1 = TestParams("A")
-        job1.testResults = listOf("tc0", "tc1", "removedTC").map { newTestResult(it) }
+        repository.testResults["A"] = listOf("tc0", "tc1", "removedTC").map { newTestResult(it) }
+        val job1 = Params("A", emptyList(), repository)
 
-        val job2 = TestParams("B")
-        job2.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
+        repository.testResults["B"] = listOf("tc0", "tc1").map { newTestResult(it) }
+        val job2 = Params("B", emptyList(), repository)
 
         strategy.apply(job1)
         val result = strategy.apply(job2)

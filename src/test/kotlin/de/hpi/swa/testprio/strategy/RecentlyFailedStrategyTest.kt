@@ -8,18 +8,23 @@ import strikt.api.expectThat
 
 class RecentlyFailedStrategyTest {
 
+    private val JOBS = listOf("A", "B")
+
     lateinit var strategy: RecentlyFailedStrategy
+    lateinit var repository: TestRepository
 
     @BeforeEach
     fun setUp() {
         strategy = RecentlyFailedStrategy(alpha = 0.8)
+        repository = TestRepository()
     }
 
     @Test
     fun `first iteration leaves order unchanged`() {
-        val job1 = TestParams("A")
-        job1.testResults += newTestResult("tc0", failures = 0)
-        job1.testResults += newTestResult("tc1", failures = 5)
+        repository.testResults["A"] = listOf(newTestResult("tc0", failures = 0),
+                newTestResult("tc1", failures = 5))
+
+        val job1 = Params("A", JOBS, repository)
 
         val result = strategy.apply(job1)
 
@@ -28,12 +33,11 @@ class RecentlyFailedStrategyTest {
 
     @Test
     fun `second iteration promotes failure from previous run`() {
-        val job1 = TestParams("A")
-        job1.testResults += newTestResult("tc0", failures = 0)
-        job1.testResults += newTestResult("tc1", failures = 5)
+        repository.testResults["A"] = listOf(newTestResult("tc0", failures = 0), newTestResult("tc1", failures = 5))
+        val job1 = Params("A", JOBS, repository)
 
-        val job2 = TestParams("B", jobIndex = 1)
-        job2.testResults = listOf("tc0", "tc1").map { newTestResult(it) }
+        repository.testResults["B"] = listOf("tc0", "tc1").map { newTestResult(it) }
+        val job2 = Params("B", JOBS, repository)
 
         strategy.apply(job1)
         val result = strategy.apply(job2)
