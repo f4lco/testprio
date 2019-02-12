@@ -14,6 +14,7 @@ import de.hpi.swa.testprio.parser.BuckParser
 import de.hpi.swa.testprio.parser.LogParser
 import de.hpi.swa.testprio.parser.MavenLogParser
 import de.hpi.swa.testprio.probe.DatabaseRepository
+import de.hpi.swa.testprio.probe.Patches
 import de.hpi.swa.testprio.strategy.RecentlyFailedStrategy
 import de.hpi.swa.testprio.strategy.LeastRecentlyUsedStrategy
 import de.hpi.swa.testprio.strategy.RandomStrategy
@@ -70,6 +71,7 @@ private class Parse : CliktCommand(help = "Parse test results from build log fil
 
 private open class PrioritizeCommand(name: String?, help: String = "") : DatabaseCommand(name = name, help = help) {
     val projectName by option("--project").required()
+    val patchTable by option("--patches").choice(Patches.ALL_BUILT_COMMITS, Patches.COMMITS_IN_PUSH).default(Patches.ALL_BUILT_COMMITS)
     val output by option("--output").file(exists = false, folderOkay = false).required()
 }
 
@@ -83,7 +85,7 @@ private class PrioritizeMatrix : PrioritizeCommand(
 
     override fun run() {
         makeContext().use {
-            val repository = DatabaseRepository(it)
+            val repository = DatabaseRepository(it, patchTable)
             val cache = Cache(cacheDirectory)
             val strategy = ChangeMatrixStrategy(
                     repository,
@@ -105,7 +107,7 @@ private class PrioritizeSimilarityMatrix : PrioritizeCommand(
 
     override fun run() {
         makeContext().use {
-            val repository = DatabaseRepository(it)
+            val repository = DatabaseRepository(it, patchTable)
             val cache = Cache(cacheDirectory)
             val strategy = ChangeMatrixSimilarityStrategy(
                     repository,
@@ -123,7 +125,7 @@ private class PrioritizeUntreated : PrioritizeCommand(
 
     override fun run() {
         makeContext().use {
-            val repository = DatabaseRepository(it)
+            val repository = DatabaseRepository(it, patchTable)
             StrategyRunner(repository).run(projectName, UntreatedStrategy(), output)
         }
     }
@@ -137,7 +139,7 @@ private class PrioritizeRecentlyFailed : PrioritizeCommand(
 
     override fun run() {
         makeContext().use {
-            val repository = DatabaseRepository(it)
+            val repository = DatabaseRepository(it, patchTable)
             StrategyRunner(repository).run(projectName, RecentlyFailedStrategy(alpha), output)
         }
     }
@@ -149,7 +151,7 @@ private class PrioritizeLRU : PrioritizeCommand(
 
     override fun run() {
         makeContext().use {
-            val repository = DatabaseRepository(it)
+            val repository = DatabaseRepository(it, patchTable)
             StrategyRunner(repository).run(projectName, LeastRecentlyUsedStrategy(), output)
         }
     }
@@ -160,7 +162,7 @@ private class PrioritizeRandom : PrioritizeCommand(name = "random", help = "Rand
 
     override fun run() {
         makeContext().use {
-            val repository = DatabaseRepository(it)
+            val repository = DatabaseRepository(it, patchTable)
             StrategyRunner(repository).run(projectName, RandomStrategy(seed), output)
         }
     }
