@@ -97,7 +97,7 @@ private class PrioritizeMatrix : PrioritizeCommand(
 }
 
 private class PrioritizeSimilarityMatrix : PrioritizeCommand(
-        name = "simimatrix",
+        name = "matrix-similarity",
         help = "Prioritize using similarity matrix") {
 
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))

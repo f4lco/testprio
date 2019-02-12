@@ -10,7 +10,7 @@ function run_strategy() {
   java -jar ${PRIO_JAR} $1 --user ma --project ${project} --output ${slug}-$1.csv
 }
 
-for strategy in untreated random lru recently-failed matrix
+for strategy in untreated random lru recently-failed matrix matrix-similarity
 do
   echo ${strategy}
   run_strategy ${strategy}
