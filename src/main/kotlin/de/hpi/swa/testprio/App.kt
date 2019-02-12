@@ -14,6 +14,7 @@ import de.hpi.swa.testprio.parser.BuckParser
 import de.hpi.swa.testprio.parser.LogParser
 import de.hpi.swa.testprio.parser.MavenLogParser
 import de.hpi.swa.testprio.probe.DatabaseRepository
+import de.hpi.swa.testprio.probe.Patches
 import de.hpi.swa.testprio.strategy.RecentlyFailedStrategy
 import de.hpi.swa.testprio.strategy.LeastRecentlyUsedStrategy
 import de.hpi.swa.testprio.strategy.RandomStrategy
@@ -70,6 +71,7 @@ private class Parse : CliktCommand(help = "Parse test results from build log fil
 
 private open class PrioritizeCommand(name: String?, help: String = "") : DatabaseCommand(name = name, help = help) {
     val projectName by option("--project").required()
+    val patchTable by option("--patches").choice(Patches.ALL_BUILT_COMMITS, Patches.COMMITS_IN_PUSH).default(Patches.ALL_BUILT_COMMITS)
     val output by option("--output").file(exists = false, folderOkay = false).required()
 }
 
