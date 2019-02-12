@@ -45,16 +45,12 @@ class ChangeMatrixStrategy(
     }
 
     private fun selectJobsByWindowSize(p: Params): Sequence<String> {
-        return when (windowSize) {
-
-            -1 -> p.jobIds
-
-            else -> {
-                val end = p.jobIds.indexOfFirst { p.jobId == it }
-                if (end == -1) throw IllegalArgumentException(p.jobId)
-                val begin = Math.max(end - windowSize, 0)
-                p.jobIds.subList(begin, end)
-            }
-        }.asSequence()
+        val end = p.jobIds.indexOf(p.jobId)
+        if (end == -1) throw IllegalArgumentException(p.jobId)
+        val begin = when (windowSize) {
+            -1 -> 0
+            else -> Math.max(end - windowSize, 0)
+        }
+        return p.jobIds.subList(begin, end).asSequence()
     }
 }

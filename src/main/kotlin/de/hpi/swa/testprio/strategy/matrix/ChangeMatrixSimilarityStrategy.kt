@@ -32,7 +32,7 @@ class ChangeMatrixSimilarityStrategy(
     }
 
     override fun apply(p: Params): List<TestResult> {
-        val unitMatrices = p.jobIds.map(::matrixFor)
+        val unitMatrices = selectJobs(p).map(::matrixFor)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 
         val fileToSimilarity: Map<String, Double> = sumMatrix.matrix.keys.associate { key ->
@@ -46,7 +46,14 @@ class ChangeMatrixSimilarityStrategy(
             }.sum()
         }
 
-        return p.testResults.sortedByDescending { order[it] } }
+        return p.testResults.sortedByDescending { order[it] }
+    }
+
+    private fun selectJobs(p: Params): List<String> {
+        val end = p.jobIds.indexOf(p.jobId)
+        if (end == -1) throw IllegalArgumentException(p.jobId)
+        return p.jobIds.subList(0, end)
+    }
 
     private fun similarity(p: Params, file: String, matrix: Matrix): Double = p.changedFiles.map { changedFile ->
         similarity(matrix, file, changedFile)
