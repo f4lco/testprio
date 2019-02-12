@@ -1,14 +1,11 @@
 package de.hpi.swa.testprio.strategy
 
 import hasTestOrder
-import newTestResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 
 class RecentlyFailedStrategyTest {
-
-    private val JOBS = listOf("A", "B")
 
     lateinit var strategy: RecentlyFailedStrategy
     lateinit var repository: TestRepository
@@ -21,27 +18,22 @@ class RecentlyFailedStrategyTest {
 
     @Test
     fun `first iteration leaves order unchanged`() {
-        repository.testResults["A"] = listOf(newTestResult("tc0", failures = 0),
-                newTestResult("tc1", failures = 5))
+        repository.loadTestResult("repeated-failure.csv")
 
-        val job1 = Params("A", JOBS, repository)
-
-        val result = strategy.apply(job1)
+        val result = strategy.apply(params("1"))
 
         expectThat(result).hasTestOrder("tc0", "tc1")
     }
 
     @Test
     fun `second iteration promotes failure from previous run`() {
-        repository.testResults["A"] = listOf(newTestResult("tc0", failures = 0), newTestResult("tc1", failures = 5))
-        val job1 = Params("A", JOBS, repository)
+        repository.loadTestResult("repeated-failure.csv")
 
-        repository.testResults["B"] = listOf("tc0", "tc1").map { newTestResult(it) }
-        val job2 = Params("B", JOBS, repository)
-
-        strategy.apply(job1)
-        val result = strategy.apply(job2)
+        strategy.apply(params("1"))
+        val result = strategy.apply(params("2"))
 
         expectThat(result).hasTestOrder("tc1", "tc0")
     }
+
+    private fun params(jobId: String) = Params(jobId, repository.jobIds(), repository)
 }

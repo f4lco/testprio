@@ -4,7 +4,6 @@ import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.CountingReducer
 import hasTestOrder
-import newTestResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -12,14 +11,6 @@ import strikt.api.expectThat
 import java.io.File
 
 class ChangeMatrixSimilarityStrategyTest {
-
-    private val FIRST_JOB = "1"
-    private val SECOND_JOB = "2"
-    private val JOBS = listOf(FIRST_JOB, SECOND_JOB)
-
-    private val CAR = "src/Car.java"
-    private val ACCELERATE = "drive"
-    private val BREAK = "light"
 
     lateinit var strategy: ChangeMatrixSimilarityStrategy
     lateinit var repository: TestRepository
@@ -33,16 +24,15 @@ class ChangeMatrixSimilarityStrategyTest {
 
     @Test
     fun `TC gets promoted due to previous failure with similar file changes`() {
-        repository.changedFiles[FIRST_JOB] = listOf(CAR)
-        repository.testResults[FIRST_JOB] = listOf(newTestResult(ACCELERATE, failures = 3))
+        with(repository) {
+            loadTestResult("repeated-failure.csv")
+            loadChangedFiles("repeated-change.csv")
+        }
 
-        repository.changedFiles[SECOND_JOB] = listOf(CAR)
-        repository.testResults[SECOND_JOB] = listOf(newTestResult(BREAK), newTestResult(ACCELERATE))
+        val result = strategy.apply(params("2"))
 
-        val params = Params(SECOND_JOB, JOBS, repository)
-
-        val result = strategy.apply(params)
-
-        expectThat(result).hasTestOrder(ACCELERATE, BREAK)
+        expectThat(result).hasTestOrder("tc1", "tc0")
     }
+
+    private fun params(jobId: String) = Params(jobId, repository.jobIds(), repository)
 }
