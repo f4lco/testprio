@@ -1,8 +1,7 @@
-package de.hpi.swa.testprio.strategy
+package de.hpi.swa.testprio.strategy.matrix
 
-import de.hpi.swa.testprio.strategy.matrix.Cache
-import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy
-import de.hpi.swa.testprio.strategy.matrix.CountingReducer
+import de.hpi.swa.testprio.strategy.Params
+import de.hpi.swa.testprio.strategy.TestRepository
 import hasTestOrder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
