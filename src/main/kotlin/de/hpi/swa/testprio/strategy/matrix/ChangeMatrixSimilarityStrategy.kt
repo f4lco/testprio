@@ -35,7 +35,7 @@ class ChangeMatrixSimilarityStrategy(
         val unitMatrices = selectJobs(p).map(::matrixFor)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 
-        val fileToSimilarity: Map<String, Double> = sumMatrix.fileNames.associate { fileName ->
+        val fileToSimilarity: Map<String, Double> = sumMatrix.fileNames().associate { fileName ->
             fileName to similarity(p, fileName, sumMatrix)
         }
 
