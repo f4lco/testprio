@@ -17,6 +17,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.10.0")
     implementation("com.github.ajalt:clikt:1.6.0")
     implementation("org.apache.commons:commons-csv:1.6")
+    implementation("org.apache.commons:commons-text:1.6")
     implementation("me.tongfei:progressbar:0.7.2")
 
     implementation("org.jooq:jooq:3.11.9")
