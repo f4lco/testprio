@@ -18,6 +18,7 @@ import de.hpi.swa.testprio.probe.Patches
 import de.hpi.swa.testprio.strategy.RecentlyFailedStrategy
 import de.hpi.swa.testprio.strategy.LeastRecentlyUsedStrategy
 import de.hpi.swa.testprio.strategy.RandomStrategy
+import de.hpi.swa.testprio.strategy.PathTCOverlapStrategy
 import de.hpi.swa.testprio.strategy.StrategyRunner
 import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy
@@ -164,6 +165,18 @@ private class PrioritizeTCSimilarityMatrix : PrioritizeCommand(
     }
 }
 
+private class PrioritizePathTCOverlap : PrioritizeCommand(
+        name = "path-tc-overlap",
+        help = "Prioritize test case with names similar to path parts") {
+
+    override fun run() {
+        makeContext().use {
+            val repository = DatabaseRepository(it, patchTable)
+            StrategyRunner(repository).run(projectName, PathTCOverlapStrategy(), output)
+        }
+    }
+}
+
 private class PrioritizeUntreated : PrioritizeCommand(
         name = "untreated",
         help = "Output the untreated test order") {
@@ -222,6 +235,7 @@ fun main(args: Array<String>) = EntryPoint().subcommands(
         PrioritizeRandom(),
         PrioritizeLRU(),
         PrioritizeRecentlyFailed(),
+        PrioritizePathTCOverlap(),
         PrioritizeMatrix(),
         PrioritizeSimilarityMatrix(),
         PrioritizePathSimilarityMatrix(),
