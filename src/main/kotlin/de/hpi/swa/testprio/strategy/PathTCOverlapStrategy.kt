@@ -6,6 +6,8 @@ import org.apache.commons.text.similarity.SimilarityScore
 
 class PathTCOverlapStrategy(val similarity: SimilarityScore<Int> = LongestCommonSubsequence()) : PrioritisationStrategy {
 
+    private val nonWordChars = "\\W".toRegex()
+
     override fun apply(p: Params): List<TestResult> {
         return p.testResults.sortedByDescending {
             overlap(p.changedFiles, it.name)
@@ -18,6 +20,9 @@ class PathTCOverlapStrategy(val similarity: SimilarityScore<Int> = LongestCommon
 
     private fun overlap(fileName: String, tc: String): Int {
         val parts: List<String> = fileName.split('/')
-        return parts.sumBy { similarity.apply(it.toLowerCase(), tc.toLowerCase()) }
+        val normalizedTestName = normalize(tc)
+        return parts.sumBy { similarity.apply(normalize(it), normalizedTestName) }
     }
+
+    private fun normalize(s: String) = s.replace(nonWordChars, "").toLowerCase()
 }
