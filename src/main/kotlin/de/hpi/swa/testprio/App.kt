@@ -23,6 +23,7 @@ import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.PathSimilarityStrategy
+import de.hpi.swa.testprio.strategy.matrix.TCSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.DevaluationReducer
 import de.hpi.swa.testprio.strategy.UntreatedStrategy
 import org.jooq.DSLContext
@@ -142,6 +143,27 @@ private class PrioritizePathSimilarityMatrix : PrioritizeCommand(
     }
 }
 
+private class PrioritizeTCSimilarityMatrix : PrioritizeCommand(
+        name = "matrix-tc-similarity",
+        help = "Prioritize TC similar to those connected to the change"
+) {
+    val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
+    val alpha by option("--alpha").double().default(0.8)
+
+    override fun run() {
+        makeContext().use {
+            val repository = DatabaseRepository(it, patchTable)
+            val cache = Cache(cacheDirectory)
+            val strategy = TCSimilarityStrategy(
+                    repository,
+                    cache,
+                    DevaluationReducer(alpha))
+
+            StrategyRunner(repository).run(projectName, strategy, output)
+        }
+    }
+}
+
 private class PrioritizeUntreated : PrioritizeCommand(
         name = "untreated",
         help = "Output the untreated test order") {
@@ -203,4 +225,5 @@ fun main(args: Array<String>) = EntryPoint().subcommands(
         PrioritizeMatrix(),
         PrioritizeSimilarityMatrix(),
         PrioritizePathSimilarityMatrix(),
+        PrioritizeTCSimilarityMatrix(),
         PrioritizeUntreated()).main(args)
