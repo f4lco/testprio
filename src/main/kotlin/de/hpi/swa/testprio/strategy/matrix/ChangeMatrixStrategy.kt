@@ -6,34 +6,16 @@ import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
 
 class ChangeMatrixStrategy(
-    val repository: Repository,
-    val cache: Cache,
+    repository: Repository,
+    cache: Cache,
     val reducer: Reducer,
     val windowSize: Int = 100
 ) : PrioritisationStrategy {
 
-    private fun matrixFor(jobId: String): Matrix {
-        return cache.get(jobId, ::computeMatrix)
-    }
-
-    private fun computeMatrix(jobId: String): Matrix {
-        val changedFiles = repository.changedFiles(jobId)
-        val testResults = repository.testResults(jobId)
-        return createUnitMatrix(jobId, changedFiles, testResults)
-    }
-
-    private fun createUnitMatrix(jobId: String, changedFiles: List<String>, testResults: List<TestResult>): Matrix {
-        val matrix = mutableMapOf<Key, Int>()
-        for (test in testResults.filter { it.red > 0 }) {
-            for (file in changedFiles) {
-                matrix.merge(Key(file, test.name), test.red, Int::plus)
-            }
-        }
-        return if (matrix.isEmpty()) Matrix(jobId, emptyMap()) else Matrix(jobId, matrix)
-    }
+    private val unitMatrix = UnitMatrix(cache, repository)
 
     override fun apply(p: Params): List<TestResult> {
-        val unitMatrices = selectJobsByWindowSize(p).map(::matrixFor)
+        val unitMatrices = selectJobsByWindowSize(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 
         return p.testResults.sortedByDescending { test ->

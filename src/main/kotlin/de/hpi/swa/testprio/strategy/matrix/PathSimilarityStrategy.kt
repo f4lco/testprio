@@ -8,34 +8,16 @@ import org.apache.commons.text.similarity.LongestCommonSubsequence
 import org.apache.commons.text.similarity.SimilarityScore
 
 class PathSimilarityStrategy(
-    val repository: Repository,
-    val cache: Cache,
+    repository: Repository,
+    cache: Cache,
     val reducer: Reducer,
     val similarity: SimilarityScore<Int> = LongestCommonSubsequence()
 ) : PrioritisationStrategy {
 
-    private fun matrixFor(jobId: String): Matrix {
-        return cache.get(jobId, ::computeMatrix)
-    }
-
-    private fun computeMatrix(jobId: String): Matrix {
-        val changedFiles = repository.changedFiles(jobId)
-        val testResults = repository.testResults(jobId)
-        return createUnitMatrix(jobId, changedFiles, testResults)
-    }
-
-    private fun createUnitMatrix(jobId: String, changedFiles: List<String>, testResults: List<TestResult>): Matrix {
-        val matrix = mutableMapOf<Key, Int>()
-        for (test in testResults.filter { it.red > 0 }) {
-            for (file in changedFiles) {
-                matrix.merge(Key(file, test.name), test.red, Int::plus)
-            }
-        }
-        return if (matrix.isEmpty()) Matrix(jobId, emptyMap()) else Matrix(jobId, matrix)
-    }
+    private val unitMatrix = UnitMatrix(cache, repository)
 
     override fun apply(p: Params): List<TestResult> {
-        val unitMatrices = selectJobs(p).map(::matrixFor)
+        val unitMatrices = selectJobs(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 
         val priorities = sumMatrix.fileNames().associateWith { similarity(p, it) }
