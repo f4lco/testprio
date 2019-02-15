@@ -4,8 +4,8 @@ import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Repository
 
 class UnitMatrix(
-    val cache: Cache,
-    val repository: Repository
+    val repository: Repository,
+    val cache: Cache
 ) {
 
     fun get(jobId: String): Matrix {

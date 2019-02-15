@@ -12,7 +12,7 @@ class ChangeMatrixStrategy(
     val windowSize: Int = 100
 ) : PrioritisationStrategy {
 
-    private val unitMatrix = UnitMatrix(cache, repository)
+    private val unitMatrix = UnitMatrix(repository, cache)
 
     override fun apply(p: Params): List<TestResult> {
         val unitMatrices = selectJobsByWindowSize(p).map(unitMatrix::get)

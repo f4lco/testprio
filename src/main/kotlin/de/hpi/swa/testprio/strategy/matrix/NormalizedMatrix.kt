@@ -12,7 +12,7 @@ class NormalizedMatrix(
     val reducer: Reducer
 ) : PrioritisationStrategy {
 
-    private val unitMatrix = UnitMatrix(cache, repository)
+    private val unitMatrix = UnitMatrix(repository, cache)
 
     override fun apply(p: Params): List<TestResult> {
         val unitMatrices = selectJobs(p).map(unitMatrix::get)
