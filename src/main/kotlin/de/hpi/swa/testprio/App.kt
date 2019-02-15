@@ -26,6 +26,7 @@ import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.PathSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.TCSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.DevaluationReducer
+import de.hpi.swa.testprio.strategy.matrix.NormalizedMatrix
 import de.hpi.swa.testprio.strategy.UntreatedStrategy
 import org.jooq.DSLContext
 import org.jooq.SQLDialect
@@ -115,6 +116,29 @@ private class PrioritizeSimilarityMatrix : PrioritizeCommand(
             val strategy = ChangeMatrixSimilarityStrategy(
                     repository,
                     cache,
+                    DevaluationReducer(alpha))
+
+            StrategyRunner(repository).run(projectName, strategy, output)
+        }
+    }
+}
+
+private class PrioritizeNormalizedMatrix : PrioritizeCommand(
+        name = "matrix-normalized",
+        help = "Prioritize using normalized matrix") {
+
+    val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
+    val alpha by option("--alpha").double().default(0.8)
+    val prior by option("--prior").double().default(0.8)
+
+    override fun run() {
+        makeContext().use {
+            val repository = DatabaseRepository(it, patchTable)
+            val cache = Cache(cacheDirectory)
+            val strategy = NormalizedMatrix(
+                    repository,
+                    cache,
+                    prior,
                     DevaluationReducer(alpha))
 
             StrategyRunner(repository).run(projectName, strategy, output)
@@ -240,4 +264,5 @@ fun main(args: Array<String>) = EntryPoint().subcommands(
         PrioritizeSimilarityMatrix(),
         PrioritizePathSimilarityMatrix(),
         PrioritizeTCSimilarityMatrix(),
+        PrioritizeNormalizedMatrix(),
         PrioritizeUntreated()).main(args)
