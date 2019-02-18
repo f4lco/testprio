@@ -19,6 +19,7 @@ dependencies {
     implementation("org.apache.commons:commons-csv:1.6")
     implementation("org.apache.commons:commons-text:1.6")
     implementation("me.tongfei:progressbar:0.7.2")
+    implementation("com.google.guava:guava:27.0.1-jre")
 
     implementation("org.jooq:jooq:3.11.9")
     implementation("org.postgresql:postgresql:42.2.5.jre7")
