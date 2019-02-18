@@ -33,7 +33,7 @@ dependencies {
 }
 
 val shadowJar by tasks.getting(ShadowJar::class) {
-    manifest.attributes["Main-Class"] = "de.hpi.swa.testprio.AppKt"
+    manifest.attributes["Main-Class"] = "de.hpi.swa.testprio.cli.AppKt"
 }
 
 val test by tasks.getting(Test::class) {
