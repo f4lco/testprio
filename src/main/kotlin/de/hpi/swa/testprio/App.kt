@@ -22,7 +22,7 @@ import de.hpi.swa.testprio.strategy.PathTCOverlapStrategy
 import de.hpi.swa.testprio.strategy.StrategyRunner
 import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.NaiveMatrix
-import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixSimilarityStrategy
+import de.hpi.swa.testprio.strategy.matrix.FileFailureDistributionSimilarity
 import de.hpi.swa.testprio.strategy.matrix.PathSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.TestCaseFailureDistributionSimilarity
 import de.hpi.swa.testprio.strategy.matrix.DevaluationReducer
@@ -102,8 +102,8 @@ private class PrioritizeNaiveMatrix : PrioritizeCommand(
     }
 }
 
-private class PrioritizeSimilarityMatrix : PrioritizeCommand(
-        name = "matrix-similarity",
+private class PrioritizeFileSimilarityMatrix : PrioritizeCommand(
+        name = "matrix-file-similarity",
         help = "Prioritize using similarity matrix") {
 
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
@@ -113,7 +113,7 @@ private class PrioritizeSimilarityMatrix : PrioritizeCommand(
         makeContext().use {
             val repository = DatabaseRepository(it, patchTable)
             val cache = Cache(cacheDirectory)
-            val strategy = ChangeMatrixSimilarityStrategy(
+            val strategy = FileFailureDistributionSimilarity(
                     repository,
                     cache,
                     DevaluationReducer(alpha))
@@ -168,7 +168,7 @@ private class PrioritizePathSimilarityMatrix : PrioritizeCommand(
     }
 }
 
-private class PrioritizeTCSimilarityMatrix : PrioritizeCommand(
+private class PrioritizeTestCaseSimilarityMatrix : PrioritizeCommand(
         name = "matrix-tc-similarity",
         help = "Prioritize TC similar to those connected to the change"
 ) {
@@ -261,8 +261,8 @@ fun main(args: Array<String>) = EntryPoint().subcommands(
         PrioritizeRecentlyFailed(),
         PrioritizePathTCOverlap(),
         PrioritizeNaiveMatrix(),
-        PrioritizeSimilarityMatrix(),
+        PrioritizeFileSimilarityMatrix(),
         PrioritizePathSimilarityMatrix(),
-        PrioritizeTCSimilarityMatrix(),
+        PrioritizeTestCaseSimilarityMatrix(),
         PrioritizeNormalizedMatrix(),
         PrioritizeUntreated()).main(args)

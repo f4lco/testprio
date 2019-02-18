@@ -5,7 +5,14 @@ import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
 
-class ChangeMatrixSimilarityStrategy(
+/**
+ * Prioritize TC of files whose failure distribution is similar to the files of the changeset.
+ *
+ * Deduce similarities for all rows (files) of the matrix by comparing the failure distribution
+ * of a file to the most similar changed file. Then use the similarities as weights when
+ * computing the final priorities.
+ */
+class FileFailureDistributionSimilarity(
     repository: Repository,
     cache: Cache,
     val reducer: Reducer

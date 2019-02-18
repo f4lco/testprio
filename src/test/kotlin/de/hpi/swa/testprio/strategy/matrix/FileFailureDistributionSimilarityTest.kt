@@ -9,16 +9,16 @@ import org.junit.jupiter.api.io.TempDir
 import strikt.api.expectThat
 import java.io.File
 
-class ChangeMatrixSimilarityStrategyTest {
+class FileFailureDistributionSimilarityTest {
 
-    lateinit var strategy: ChangeMatrixSimilarityStrategy
+    lateinit var strategy: FileFailureDistributionSimilarity
     lateinit var repository: TestRepository
     @TempDir lateinit var cache: File
 
     @BeforeEach
     fun setUp() {
         repository = TestRepository()
-        strategy = ChangeMatrixSimilarityStrategy(repository, Cache(cache), CountingReducer)
+        strategy = FileFailureDistributionSimilarity(repository, Cache(cache), CountingReducer)
     }
 
     @Test
