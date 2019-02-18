@@ -7,6 +7,14 @@ import de.hpi.swa.testprio.strategy.PrioritisationStrategy
 import org.apache.commons.text.similarity.LongestCommonSubsequence
 import org.apache.commons.text.similarity.SimilarityScore
 
+/**
+ * Assign matrix row weights by how similar the path names are w.r.t. to any of the changed files.
+ *
+ * This strategy improves the naive approach by assigning positive weights to files similar to the
+ * changed files, measured by longest common subsequence.
+ * Especially on Java projects with a nested package structure this strategy may prioritize TC which
+ * treat the same or related components / features / topics, as the changeset at hand.
+ */
 class PathSimilarityStrategy(
     repository: Repository,
     cache: Cache,
@@ -31,11 +39,7 @@ class PathSimilarityStrategy(
         }
     }
 
-    private fun selectJobs(p: Params): List<String> {
-        val end = p.jobIds.indexOf(p.jobId)
-        if (end == -1) throw IllegalArgumentException(p.jobId)
-        return p.jobIds.subList(0, end)
-    }
+    private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 
     private fun similarity(p: Params, fileName: String): Double {
         return p.changedFiles.map { similarity.apply(it, fileName).toDouble() }.max() ?: 1.0
