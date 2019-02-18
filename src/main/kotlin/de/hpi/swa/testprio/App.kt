@@ -21,7 +21,7 @@ import de.hpi.swa.testprio.strategy.RandomStrategy
 import de.hpi.swa.testprio.strategy.PathTCOverlapStrategy
 import de.hpi.swa.testprio.strategy.StrategyRunner
 import de.hpi.swa.testprio.strategy.matrix.Cache
-import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixStrategy
+import de.hpi.swa.testprio.strategy.matrix.NaiveMatrix
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.PathSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.TCSimilarityStrategy
@@ -79,9 +79,9 @@ private open class PrioritizeCommand(name: String?, help: String = "") : Databas
     val output by option("--output").file(exists = false, folderOkay = false).required()
 }
 
-private class PrioritizeMatrix : PrioritizeCommand(
-        name = "matrix",
-        help = "Prioritize using counting matrix") {
+private class PrioritizeNaiveMatrix : PrioritizeCommand(
+        name = "matrix-naive",
+        help = "Prioritize using naive matrix approach") {
 
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
     val windowSize by option("--window").int().default(100)
@@ -91,7 +91,7 @@ private class PrioritizeMatrix : PrioritizeCommand(
         makeContext().use {
             val repository = DatabaseRepository(it, patchTable)
             val cache = Cache(cacheDirectory)
-            val strategy = ChangeMatrixStrategy(
+            val strategy = NaiveMatrix(
                     repository,
                     cache,
                     DevaluationReducer(alpha),
@@ -260,7 +260,7 @@ fun main(args: Array<String>) = EntryPoint().subcommands(
         PrioritizeLRU(),
         PrioritizeRecentlyFailed(),
         PrioritizePathTCOverlap(),
-        PrioritizeMatrix(),
+        PrioritizeNaiveMatrix(),
         PrioritizeSimilarityMatrix(),
         PrioritizePathSimilarityMatrix(),
         PrioritizeTCSimilarityMatrix(),

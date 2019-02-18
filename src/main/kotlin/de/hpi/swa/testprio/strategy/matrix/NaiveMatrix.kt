@@ -5,7 +5,19 @@ import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
 
-class ChangeMatrixStrategy(
+/**
+ * Naive matrix strategy.
+ *
+ * Considering *N* observations from the past, build a sum matrix (with optional devaluation).
+ * Limit the rows of the sum matrix to the current set of changed files, and compute column
+ * sum (= cumulative failure counts) for all TC. The failure counts represent priorities,
+ * such that TC of higher failure probability are promoted. The remaining TC - TC which never
+ * failed given any of the changed files of this revision - have priority zero.
+ *
+ * @param reducer the reduction function to use when summing matrices
+ * @param windowSize the maximum number of observations to consider; `-1` means all observations
+ */
+class NaiveMatrix(
     repository: Repository,
     cache: Cache,
     val reducer: Reducer,
@@ -27,8 +39,7 @@ class ChangeMatrixStrategy(
     }
 
     private fun selectJobsByWindowSize(p: Params): Sequence<String> {
-        val end = p.jobIds.indexOf(p.jobId)
-        if (end == -1) throw IllegalArgumentException(p.jobId)
+        val end = p.jobIndex
         val begin = when (windowSize) {
             -1 -> 0
             else -> Math.max(end - windowSize, 0)

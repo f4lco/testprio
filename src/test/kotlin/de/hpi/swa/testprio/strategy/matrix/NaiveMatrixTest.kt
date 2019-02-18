@@ -9,16 +9,16 @@ import org.junit.jupiter.api.io.TempDir
 import strikt.api.expectThat
 import java.io.File
 
-class ChangeMatrixStrategyTest {
+class NaiveMatrixTest {
 
-    lateinit var strategy: ChangeMatrixStrategy
+    lateinit var strategy: NaiveMatrix
     lateinit var repository: TestRepository
     @TempDir lateinit var cache: File
 
     @BeforeEach
     fun setUp() {
         repository = TestRepository()
-        strategy = ChangeMatrixStrategy(repository, Cache(cache), CountingReducer)
+        strategy = NaiveMatrix(repository, Cache(cache), CountingReducer)
     }
 
     @Test

@@ -2,7 +2,7 @@
 source .testprio
 
 seq 0 0.1 1 | xargs -t -Ivalue java -jar $PRIO_JAR \
-  matrix \
+  matrix-naive \
   --host localhost \
   --port 5432 \
   --user ma \
