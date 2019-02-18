@@ -12,3 +12,5 @@ build
 # Exclude toplevel, currently used configuration file
 # Documented template resides in bin/.testprio
 /.testprio
+
+/output
