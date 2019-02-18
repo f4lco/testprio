@@ -18,7 +18,7 @@ import de.hpi.swa.testprio.probe.Patches
 import de.hpi.swa.testprio.strategy.RecentlyFailedStrategy
 import de.hpi.swa.testprio.strategy.LeastRecentlyUsedStrategy
 import de.hpi.swa.testprio.strategy.RandomStrategy
-import de.hpi.swa.testprio.strategy.PathTCOverlapStrategy
+import de.hpi.swa.testprio.strategy.PathTestCaseOverlap
 import de.hpi.swa.testprio.strategy.StrategyRunner
 import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.NaiveMatrix
@@ -196,7 +196,7 @@ private class PrioritizePathTCOverlap : PrioritizeCommand(
     override fun run() {
         makeContext().use {
             val repository = DatabaseRepository(it, patchTable)
-            StrategyRunner(repository).run(projectName, PathTCOverlapStrategy(), output)
+            StrategyRunner(repository).run(projectName, PathTestCaseOverlap(), output)
         }
     }
 }

@@ -5,15 +5,15 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
 
-class PathTCOverlapStrategyTest {
+class PathTestCaseOverlapTest {
 
     private lateinit var repository: TestRepository
-    private lateinit var strategy: PathTCOverlapStrategy
+    private lateinit var strategy: PathTestCaseOverlap
 
     @BeforeEach
     fun setUp() {
         repository = TestRepository()
-        strategy = PathTCOverlapStrategy()
+        strategy = PathTestCaseOverlap()
     }
 
     @Test

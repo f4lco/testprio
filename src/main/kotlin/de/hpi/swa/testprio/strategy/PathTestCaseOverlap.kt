@@ -4,7 +4,14 @@ import de.hpi.swa.testprio.parser.TestResult
 import org.apache.commons.text.similarity.LongestCommonSubsequence
 import org.apache.commons.text.similarity.SimilarityScore
 
-class PathTCOverlapStrategy(val similarity: SimilarityScore<Int> = LongestCommonSubsequence()) : PrioritisationStrategy {
+/**
+ * Prioritize TC with names which appear in the paths of the changed files.
+ *
+ * This may help identify naming patterns such as: subject-under-test _Foo_, covered by _FooTest_.
+ * Given that _Foo_ changed, it might be good to prioritize _FooTest_ and _FooBarTest_, but not
+ * _BarTest_.
+ */
+class PathTestCaseOverlap(val similarity: SimilarityScore<Int> = LongestCommonSubsequence()) : PrioritisationStrategy {
 
     private val nonWordChars = "\\W".toRegex()
 
