@@ -5,7 +5,17 @@ import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
 
-class TCSimilarityStrategy(
+/**
+ * Prioritize test cases whose failure distribution is similar.
+ *
+ * Given a changeset, pick a set of relevant TC as follows: collect all red TC for all
+ * of the elements of the changeset (= TC which are potentially relevant given this
+ * set of files).
+ *
+ * Prioritize the remaining test cases by the minimum distance to any of the relevant
+ * test cases.
+ */
+class TestCaseFailureDistributionSimilarity(
     repository: Repository,
     cache: Cache,
     val reducer: Reducer
@@ -23,11 +33,7 @@ class TCSimilarityStrategy(
         }
     }
 
-    private fun selectJobs(p: Params): List<String> {
-        val end = p.jobIds.indexOf(p.jobId)
-        if (end == -1) throw IllegalArgumentException(p.jobId)
-        return p.jobIds.subList(0, end)
-    }
+    private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 
     private fun collectTC(p: Params, m: Matrix): Set<String> {
         return m.matrix.keys

@@ -24,7 +24,7 @@ import de.hpi.swa.testprio.strategy.matrix.Cache
 import de.hpi.swa.testprio.strategy.matrix.NaiveMatrix
 import de.hpi.swa.testprio.strategy.matrix.ChangeMatrixSimilarityStrategy
 import de.hpi.swa.testprio.strategy.matrix.PathSimilarityStrategy
-import de.hpi.swa.testprio.strategy.matrix.TCSimilarityStrategy
+import de.hpi.swa.testprio.strategy.matrix.TestCaseFailureDistributionSimilarity
 import de.hpi.swa.testprio.strategy.matrix.DevaluationReducer
 import de.hpi.swa.testprio.strategy.matrix.NormalizedMatrix
 import de.hpi.swa.testprio.strategy.UntreatedStrategy
@@ -179,7 +179,7 @@ private class PrioritizeTCSimilarityMatrix : PrioritizeCommand(
         makeContext().use {
             val repository = DatabaseRepository(it, patchTable)
             val cache = Cache(cacheDirectory)
-            val strategy = TCSimilarityStrategy(
+            val strategy = TestCaseFailureDistributionSimilarity(
                     repository,
                     cache,
                     DevaluationReducer(alpha))
