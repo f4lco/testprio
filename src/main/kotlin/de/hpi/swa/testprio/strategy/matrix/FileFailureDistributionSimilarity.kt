@@ -15,6 +15,7 @@ import de.hpi.swa.testprio.strategy.PrioritisationStrategy
 class FileFailureDistributionSimilarity(
     repository: Repository,
     cache: Cache,
+    val prior: Double,
     val reducer: Reducer
 ) : PrioritisationStrategy {
 
@@ -24,38 +25,45 @@ class FileFailureDistributionSimilarity(
         val unitMatrices = selectJobs(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 
-        val fileToSimilarity: Map<String, Double> = sumMatrix.fileNames().associate { fileName ->
-            fileName to similarity(p, fileName, sumMatrix)
+        val fileToSimilarity: Map<String, Double> = sumMatrix.fileNames().associateWith { fileName ->
+            similarity(p, fileName, sumMatrix)
         }
 
         val order: Map<TestResult, Double> = p.testResults.associateWith { tc ->
             sumMatrix.matrix
                     .filterKeys { it.testName == tc.name }
-                    .map { entry -> fileToSimilarity.getOrDefault(entry.key.fileName, 0.0) * entry.value.toDouble()
-            }.sum()
+                    .map { entry -> (fileToSimilarity[entry.key.fileName] ?: 0.0) * entry.value.toDouble() }
+                    .sum()
         }
 
         return p.testResults.sortedByDescending { order[it] }
     }
 
-    private fun selectJobs(p: Params): List<String> {
-        val end = p.jobIds.indexOf(p.jobId)
-        if (end == -1) throw IllegalArgumentException(p.jobId)
-        return p.jobIds.subList(0, end)
-    }
+    private fun selectJobs(p: Params) = p.jobIds.subList(0, p.jobIndex)
 
-    private fun similarity(p: Params, file: String, matrix: Matrix): Double = p.changedFiles.map { changedFile ->
-        similarity(matrix, file, changedFile)
-    }.max() ?: 0.0
+    private fun similarity(p: Params, fileName: String, m: Matrix): Double = p.changedFiles.map { similarity(fileName, it, m) }.max() ?: 1.0
 
-    private fun similarity(m: Matrix, f0: String, f1: String): Double {
-        val testCases = m.matrix.keys.filter { it.fileName == f0 || it.fileName == f1 }.map { it.testName }
-        val total = testCases.sumBy { testCase ->
-            val count0: Int = m.matrix[Key(f0, testCase)] ?: 0
-            val count1: Int = m.matrix[Key(f1, testCase)] ?: 0
-            val diff = count1 - count0
-            diff * diff
+    private fun similarity(f1: String, f2: String, m: Matrix): Double {
+        val distance = norm(f1, m).toMutableMap()
+
+        for (entry in norm(f2, m)) {
+            distance.merge(entry.key, entry.value, ::squaredError)
         }
-        return if (total == 0) 1.0 else 1.0 / total
+
+        return 1 - (distance.values.min() ?: 1.0)
     }
+
+    private fun norm(f: String, m: Matrix): Map<String, Double> {
+        val allTC: Set<String> = m.matrix.keys.map { it.testName }.toSet()
+
+        val counts = allTC.associateWith { tc ->
+            val failureCount = (m.matrix[Key(f, tc)] ?: 0).toDouble()
+            prior + failureCount
+        }
+
+        val normalizer = counts.values.sum()
+        return counts.mapValues { entry -> entry.value / normalizer }
+    }
+
+    private fun squaredError(a: Double, b: Double) = Math.pow(a - b, 2.0)
 }

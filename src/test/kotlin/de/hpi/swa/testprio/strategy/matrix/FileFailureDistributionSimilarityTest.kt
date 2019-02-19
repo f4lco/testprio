@@ -18,7 +18,7 @@ class FileFailureDistributionSimilarityTest {
     @BeforeEach
     fun setUp() {
         repository = TestRepository()
-        strategy = FileFailureDistributionSimilarity(repository, Cache(cache), CountingReducer)
+        strategy = FileFailureDistributionSimilarity(repository, Cache(cache), 0.8, CountingReducer)
     }
 
     @Test

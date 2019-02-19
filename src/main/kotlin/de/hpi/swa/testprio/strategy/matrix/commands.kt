@@ -18,7 +18,6 @@ object MatrixCommands {
                 PrioritizePathSimilarityMatrix(),
                 PrioritizeFileSimilarityMatrix(),
                 PrioritizeTestCaseSimilarityMatrix(),
-                PrioritizeNormalizedMatrix(),
                 PrioritizeBloom()
     )
 
@@ -54,34 +53,13 @@ private class PrioritizeFileSimilarityMatrix : PrioritizeCommand(
 
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
     val alpha by option("--alpha").double().default(0.8)
-
-    override fun run() {
-        makeContext().use {
-            val repository = DatabaseRepository(it, patchTable)
-            val cache = Cache(cacheDirectory)
-            val strategy = FileFailureDistributionSimilarity(
-                    repository,
-                    cache,
-                    DevaluationReducer(alpha))
-
-            StrategyRunner(repository).run(projectName, strategy, output)
-        }
-    }
-}
-
-private class PrioritizeNormalizedMatrix : PrioritizeCommand(
-        name = "matrix-normalized",
-        help = "Prioritize using normalized matrix") {
-
-    val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
-    val alpha by option("--alpha").double().default(0.8)
     val prior by option("--prior").double().default(0.8)
 
     override fun run() {
         makeContext().use {
             val repository = DatabaseRepository(it, patchTable)
             val cache = Cache(cacheDirectory)
-            val strategy = NormalizedMatrix(
+            val strategy = FileFailureDistributionSimilarity(
                     repository,
                     cache,
                     prior,
