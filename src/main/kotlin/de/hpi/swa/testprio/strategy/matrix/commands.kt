@@ -98,6 +98,7 @@ private class PrioritizeTestCaseSimilarityMatrix : PrioritizeCommand(
 ) {
     val cacheDirectory by option("--cache").file(fileOkay = false, exists = true).default(File("cache"))
     val alpha by option("--alpha").double().default(0.8)
+    val prior by option("--prior").double().default(0.8)
 
     override fun run() {
         makeContext().use {
@@ -106,6 +107,7 @@ private class PrioritizeTestCaseSimilarityMatrix : PrioritizeCommand(
             val strategy = TestCaseFailureDistributionSimilarity(
                     repository,
                     cache,
+                    prior,
                     DevaluationReducer(alpha))
 
             StrategyRunner(repository).run(projectName, strategy, output)
