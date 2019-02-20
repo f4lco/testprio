@@ -24,10 +24,22 @@ interface PrioritisationStrategy {
     fun apply(p: Params): List<TestResult>
 }
 
+enum class JobSpec {
+    ALL,
+    ONLY_TEST_FAILURES,
+    ONLY_FIRST_TEST_FAILURES,
+}
+
 class StrategyRunner(val repository: Repository) {
 
-    fun run(projectName: String, strategy: PrioritisationStrategy, output: File) {
-        val jobIds = repository.redJobIdsOf(projectName)
+    fun run(
+        projectName: String,
+        jobSpec: JobSpec,
+        strategy: PrioritisationStrategy,
+        output: File
+    ) {
+
+        val jobIds = getJobs(projectName, jobSpec)
         ProgressBar("Jobs", jobIds.size.toLong()).use {
             val results = jobIds.asSequence().map { jobId ->
                 val results = processJob(jobId, jobIds, strategy)
@@ -36,6 +48,12 @@ class StrategyRunner(val repository: Repository) {
             }
             CsvOutput.writeSeq(results, output)
         }
+    }
+
+    private fun getJobs(projectName: String, jobSpec: JobSpec): List<String> = when (jobSpec) {
+        JobSpec.ALL -> repository.jobs(projectName)
+        JobSpec.ONLY_TEST_FAILURES -> repository.redJobs(projectName)
+        JobSpec.ONLY_FIRST_TEST_FAILURES -> repository.firstRedJobs(projectName)
     }
 
     private fun processJob(jobId: String, jobIds: List<String>, strategy: PrioritisationStrategy): List<TestResult> {

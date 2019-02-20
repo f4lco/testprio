@@ -54,5 +54,5 @@ class LeastRecentlyUsedStrategyTest {
         expectThat(result).hasTestOrder("tc1", "tc0")
     }
 
-    private fun params(jobId: String) = Params(jobId, repository.jobIds(), repository)
+    private fun params(jobId: String) = Params(jobId, repository.jobs(), repository)
 }

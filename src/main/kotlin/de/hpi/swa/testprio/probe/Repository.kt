@@ -4,7 +4,11 @@ import de.hpi.swa.testprio.parser.TestResult
 
 interface Repository {
 
-    fun redJobIdsOf(projectName: String): List<String>
+    fun jobs(projectName: String): List<String>
+
+    fun redJobs(projectName: String): List<String>
+
+    fun firstRedJobs(projectName: String): List<String>
 
     fun changedFiles(jobId: String): List<String>
 

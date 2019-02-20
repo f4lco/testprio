@@ -9,7 +9,7 @@ import java.math.BigDecimal
 
 object TestResults {
 
-    fun ofJob(context: DSLContext, jobId: String) =
+    fun ofJob(context: DSLContext, jobId: String): List<TestResult> =
             context.selectFrom<Record>("tr_test_result")
                     .where(field(name("tr_job_id")).eq(jobId.toInt()))
                     .orderBy(field(name("index")))

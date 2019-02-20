@@ -14,9 +14,13 @@ class TestRepository : Repository {
 
     val testResults = mutableMapOf<String, MutableList<TestResult>>()
 
-    fun jobIds() = (changedFiles.keys + testResults.keys).toList().sorted()
+    fun jobs() = (changedFiles.keys + testResults.keys).toList().sorted()
 
-    override fun redJobIdsOf(projectName: String) = TODO()
+    override fun jobs(projectName: String): List<String> = jobs()
+
+    override fun redJobs(projectName: String) = TODO()
+
+    override fun firstRedJobs(projectName: String) = TODO()
 
     override fun changedFiles(jobId: String): MutableList<String> = changedFiles.computeIfAbsent(jobId) { mutableListOf() }
 
