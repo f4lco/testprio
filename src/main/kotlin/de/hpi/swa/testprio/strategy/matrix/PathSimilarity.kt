@@ -15,7 +15,7 @@ import org.apache.commons.text.similarity.SimilarityScore
  * Especially on Java projects with a nested package structure this strategy may prioritize TC which
  * treat the same or related components / features / topics, as the changeset at hand.
  */
-class PathSimilarityStrategy(
+class PathSimilarity(
     repository: Repository,
     cache: Cache,
     val reducer: Reducer,

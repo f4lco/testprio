@@ -13,18 +13,18 @@ import java.io.File
 object MatrixCommands {
 
     private val commands = listOf<CliktCommand>(
-                PrioritizeNaiveMatrix(),
-                PrioritizePathSimilarityMatrix(),
-                PrioritizeFileSimilarityMatrix(),
-                PrioritizeTestCaseSimilarityMatrix(),
-                PrioritizeConditionalProbability(),
-                PrioritizeBloom()
+        PrioritizeNaive(),
+        PrioritizePathSimilarity(),
+        PrioritizeFileSimilarity(),
+        PrioritizeTestCaseSimilarity(),
+        PrioritizeConditionalProbability(),
+        PrioritizeBloom()
     )
 
     fun get() = commands
 }
 
-private class PrioritizeNaiveMatrix : PrioritizeCommand(
+private class PrioritizeNaive : PrioritizeCommand(
         name = "matrix-naive",
         help = "Prioritize using naive matrix approach"
 ) {
@@ -40,7 +40,7 @@ private class PrioritizeNaiveMatrix : PrioritizeCommand(
                 windowSize)
 }
 
-private class PrioritizeFileSimilarityMatrix : PrioritizeCommand(
+private class PrioritizeFileSimilarity : PrioritizeCommand(
         name = "matrix-file-similarity",
         help = "Prioritize using similarity matrix"
 ) {
@@ -55,20 +55,20 @@ private class PrioritizeFileSimilarityMatrix : PrioritizeCommand(
                     DevaluationReducer(alpha))
 }
 
-private class PrioritizePathSimilarityMatrix : PrioritizeCommand(
+private class PrioritizePathSimilarity : PrioritizeCommand(
         name = "matrix-path-similarity",
         help = "Prioritize using weighted path similarity"
 ) {
     val cacheDirectory by option("--cache").file(fileOkay = false).default(File("cache"))
     val alpha by option("--alpha").double().default(0.8)
 
-    override fun strategy(repository: Repository) = PathSimilarityStrategy(
+    override fun strategy(repository: Repository) = PathSimilarity(
             repository,
             Cache(cacheDirectory),
             DevaluationReducer(alpha))
 }
 
-private class PrioritizeTestCaseSimilarityMatrix : PrioritizeCommand(
+private class PrioritizeTestCaseSimilarity : PrioritizeCommand(
         name = "matrix-tc-similarity",
         help = "Prioritize TC similar to those connected to the change"
 ) {

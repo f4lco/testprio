@@ -9,16 +9,16 @@ import org.junit.jupiter.api.io.TempDir
 import strikt.api.expectThat
 import java.io.File
 
-class PathSimilarityStrategyTest {
+class PathSimilarityTest {
 
     private lateinit var repository: TestRepository
-    private lateinit var strategy: PathSimilarityStrategy
+    private lateinit var strategy: PathSimilarity
     @TempDir lateinit var cache: File
 
     @BeforeEach
     fun setUp() {
         repository = TestRepository()
-        strategy = PathSimilarityStrategy(repository, Cache(cache), CountingReducer)
+        strategy = PathSimilarity(repository, Cache(cache), CountingReducer)
     }
 
     @Test
