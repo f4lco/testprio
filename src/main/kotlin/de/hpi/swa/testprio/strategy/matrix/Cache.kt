@@ -1,10 +1,18 @@
 package de.hpi.swa.testprio.strategy.matrix
 
+import mu.KotlinLogging
 import java.io.File
 
 class Cache(val directory: File) {
 
+    private val LOG = KotlinLogging.logger {}
     private val cache = mutableMapOf<String, Matrix>()
+
+    init {
+        if (!directory.exists() && !directory.mkdirs()) {
+            LOG.error { "Cannot create cache directory $directory" }
+        }
+    }
 
     fun get(jobId: String, factory: (String) -> Matrix): Matrix {
         return cache[jobId] ?: computeAndStore(jobId, factory)
