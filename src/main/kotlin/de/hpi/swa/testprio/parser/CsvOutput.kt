@@ -1,5 +1,6 @@
 package de.hpi.swa.testprio.parser
 
+import mu.KotlinLogging
 import org.apache.commons.csv.CSVFormat
 import org.apache.commons.csv.CSVPrinter
 import java.io.File
@@ -7,7 +8,10 @@ import java.io.FileWriter
 
 object CsvOutput {
 
+    private val LOG = KotlinLogging.logger {}
+
     fun write(results: Sequence<ParseResult>, to: File) {
+        ensureParentExists(to)
         CSVPrinter(FileWriter(to), CSVFormat.DEFAULT).use {
             printHeader(it)
             printRecords(results, it)
@@ -15,6 +19,7 @@ object CsvOutput {
     }
 
     fun writeSeq(results: Sequence<Pair<String, List<TestResult>>>, to: File) {
+        ensureParentExists(to)
         CSVPrinter(FileWriter(to), CSVFormat.DEFAULT).use {
             printHeader(it)
             for (tr in results) {
@@ -24,6 +29,12 @@ object CsvOutput {
                     it.println()
                 }
             }
+        }
+    }
+
+    private fun ensureParentExists(f: File): Unit = f.parentFile.let { parent ->
+        if (!parent.exists() && !parent.mkdirs()) {
+            LOG.error("Cannot create parent directory: {}", parent)
         }
     }
 
