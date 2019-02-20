@@ -17,6 +17,7 @@ object MatrixCommands {
                 PrioritizePathSimilarityMatrix(),
                 PrioritizeFileSimilarityMatrix(),
                 PrioritizeTestCaseSimilarityMatrix(),
+                PrioritizeConditionalProbability(),
                 PrioritizeBloom()
     )
 
@@ -80,6 +81,20 @@ private class PrioritizeTestCaseSimilarityMatrix : PrioritizeCommand(
                     Cache(cacheDirectory),
                     prior,
                     DevaluationReducer(alpha))
+}
+
+private class PrioritizeConditionalProbability : PrioritizeCommand(
+        name = "matrix-conditional-prob",
+        help = "Prioritize with conditional probabilities"
+) {
+
+    val cacheDirectory by option("--cache").file(fileOkay = false).default(File("cache"))
+    val alpha by option("--alpha").double().default(0.8)
+
+    override fun strategy(repository: Repository) = ConditionalProbability(
+            repository,
+            Cache(cacheDirectory),
+            DevaluationReducer(alpha))
 }
 
 private class PrioritizeBloom : PrioritizeCommand(
