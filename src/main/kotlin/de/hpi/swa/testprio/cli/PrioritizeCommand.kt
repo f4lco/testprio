@@ -14,7 +14,7 @@ import de.hpi.swa.testprio.strategy.StrategyRunner
 
 abstract class PrioritizeCommand(name: String?, help: String = "") : DatabaseCommand(name = name, help = help) {
     val projectName by option("--project").required()
-    val jobs by option("--jobs").choice(JobSpec.values().associateBy { it.name }).default(JobSpec.ONLY_TEST_FAILURES)
+    val jobs by option("--jobs").choice(JobSpec.values().associateBy { it.optionName }).default(JobSpec.ONLY_TEST_FAILURES)
     val patchTable by option("--patches").choice(Patches.ALL_BUILT_COMMITS, Patches.COMMITS_IN_PUSH).default(Patches.ALL_BUILT_COMMITS)
     val output by option("--output").file(exists = false, folderOkay = false).required()
 

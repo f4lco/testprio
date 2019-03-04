@@ -24,10 +24,10 @@ interface PrioritisationStrategy {
     fun apply(p: Params): List<TestResult>
 }
 
-enum class JobSpec {
-    ALL,
-    ONLY_TEST_FAILURES,
-    ONLY_FIRST_TEST_FAILURES,
+enum class JobSpec(val optionName: String) {
+    ALL("all"),
+    ONLY_TEST_FAILURES("failed"),
+    ONLY_FIRST_TEST_FAILURES("offenders"),
 }
 
 class StrategyRunner(val repository: Repository) {
