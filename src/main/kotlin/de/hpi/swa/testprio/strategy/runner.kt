@@ -48,6 +48,10 @@ class StrategyRunner(val repository: Repository) {
             }
             CsvOutput.writeSeq(results, output)
         }
+
+        if (strategy is AutoCloseable) {
+            strategy.close()
+        }
     }
 
     private fun getJobs(projectName: String, jobSpec: JobSpec): List<String> = when (jobSpec) {

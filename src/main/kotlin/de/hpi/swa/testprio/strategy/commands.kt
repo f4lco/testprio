@@ -2,6 +2,7 @@ package de.hpi.swa.testprio.strategy
 
 import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.double
 import com.github.ajalt.clikt.parameters.types.int
 import de.hpi.swa.testprio.cli.PrioritizeCommand
@@ -15,7 +16,8 @@ object StrategyCommands {
             PrioritizeRandom(),
             PrioritizeLRU(),
             PrioritizeRecentlyFailed(),
-            PrioritizePathTCOverlap()
+            PrioritizePathTCOverlap(),
+            PrioritizeGraph()
     ) + MatrixCommands.get()
 
     fun get() = commands
@@ -55,4 +57,16 @@ private class PrioritizePathTCOverlap : PrioritizeCommand(
         help = "Prioritize test case with names similar to path parts") {
 
     override fun strategy(repository: Repository) = PathTestCaseOverlap()
+}
+
+private class PrioritizeGraph : PrioritizeCommand(
+        name = "graph",
+        help = "Prioritize test cases using graph"
+) {
+
+    val graphHost by option("--graph").default("bolt://localhost:7687")
+    val graphUser by option("--graph-user").default("neo4j")
+    val graphPassword by option("--graph-pw", envvar = "NEO4J_PASS").required()
+
+    override fun strategy(repository: Repository) = Graph(graphHost, graphUser, graphPassword)
 }
