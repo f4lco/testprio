@@ -9,7 +9,13 @@ private val logger = KotlinLogging.logger {}
 /**
  * Parse Maven log files and check for the output format of the Surefire plugin.
  *
- * The output of a test class consists of two lines: "Running ..." (test announcement) and
+ * On some versions, a single line is printed containing the test result and test name,
+ * which directly can be used to construct the test result.
+ *
+ * However, on other versions, test class name and test result occur on separate lines
+ * and need to be joined. This can be inaccurate if several tests were run in parallel,
+ * or if several modules were built in parallel.
+ * Then the output of a test class consists of two lines: "Running ..." (test announcement) and
  * "Tests run: 42, ..." (test completion, without a name / reference to the completed test).
  * These should always appear in pairs, and always end in newline.
  *
@@ -29,6 +35,8 @@ object MavenLogParser : Parser {
     private val testNamePattern = "Running (\\w+(\\.\\w+)*)".toRegex(RegexOption.MULTILINE)
 
     private val testResultPattern = "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+), Time elapsed: ([.,\\d]+?) sec".toRegex()
+
+    private val testNameAndResultPattern = (testResultPattern.pattern + "(?: <<< \\w+!)? - in (.*)\$").toRegex(RegexOption.MULTILINE)
 
     override fun parseFile(logFile: LogFile): Sequence<TestResult> {
         val content = logFile.source.readText()
@@ -61,8 +69,28 @@ object MavenLogParser : Parser {
     private fun testResultFromSection(section: Section): Sequence<TestResult> {
         logger.debug("Processing section: {} ({} - {})",
                 section.name, section.firstChar, section.lastChar)
+        return testResultsExact(section).ifEmpty { testResultsUsingHeuristic(section) }
+    }
 
+    private fun testResultsExact(section: Section): Sequence<TestResult> {
+        return testNameAndResultPattern.findAll(section.content).mapIndexed { index, match ->
+            val (count, failures, errors, skipped, duration, testName) = match.destructured
+            TestResult(
+                name = testName,
+                index = index,
+                duration = duration.replace(",", "").toBigDecimal(),
+                count = count.toInt(),
+                failures = failures.toInt(),
+                errors = errors.toInt(),
+                skipped = skipped.toInt()
+            )
+        }
+    }
+
+    private fun testResultsUsingHeuristic(section: Section): Sequence<TestResult> {
         val announced = findTestAnnounced(section).toList()
+        if (announced.isEmpty()) return emptySequence()
+
         val completed = findTestCompleted(section).toList()
 
         if (announced.size != completed.size) {
