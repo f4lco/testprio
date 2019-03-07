@@ -18,7 +18,8 @@ object MatrixCommands {
         PrioritizeFileSimilarity(),
         PrioritizeTestCaseSimilarity(),
         PrioritizeConditionalProbability(),
-        PrioritizeBloom()
+        PrioritizeBloom(),
+        PrioritizeRecentlyChanged()
     )
 
     fun get() = commands
@@ -34,10 +35,10 @@ private class PrioritizeNaive : PrioritizeCommand(
     val alpha by option("--alpha").double().default(0.8)
 
     override fun strategy(repository: Repository) = NaiveMatrix(
-                repository,
-                Cache(cacheDirectory),
-                DevaluationReducer(alpha),
-                windowSize)
+        repository,
+        Cache(cacheDirectory),
+        DevaluationReducer(alpha),
+        windowSize)
 }
 
 private class PrioritizeFileSimilarity : PrioritizeCommand(
@@ -49,10 +50,10 @@ private class PrioritizeFileSimilarity : PrioritizeCommand(
     val prior by option("--prior").double().default(0.8)
 
     override fun strategy(repository: Repository) = FileFailureDistributionSimilarity(
-                    repository,
-                    Cache(cacheDirectory),
-                    prior,
-                    DevaluationReducer(alpha))
+        repository,
+        Cache(cacheDirectory),
+        prior,
+        DevaluationReducer(alpha))
 }
 
 private class PrioritizePathSimilarity : PrioritizeCommand(
@@ -63,9 +64,9 @@ private class PrioritizePathSimilarity : PrioritizeCommand(
     val alpha by option("--alpha").double().default(0.8)
 
     override fun strategy(repository: Repository) = PathSimilarity(
-            repository,
-            Cache(cacheDirectory),
-            DevaluationReducer(alpha))
+        repository,
+        Cache(cacheDirectory),
+        DevaluationReducer(alpha))
 }
 
 private class PrioritizeTestCaseSimilarity : PrioritizeCommand(
@@ -77,10 +78,10 @@ private class PrioritizeTestCaseSimilarity : PrioritizeCommand(
     val prior by option("--prior").double().default(0.8)
 
     override fun strategy(repository: Repository) = TestCaseFailureDistributionSimilarity(
-                    repository,
-                    Cache(cacheDirectory),
-                    prior,
-                    DevaluationReducer(alpha))
+        repository,
+        Cache(cacheDirectory),
+        prior,
+        DevaluationReducer(alpha))
 }
 
 private class PrioritizeConditionalProbability : PrioritizeCommand(
@@ -92,9 +93,9 @@ private class PrioritizeConditionalProbability : PrioritizeCommand(
     val alpha by option("--alpha").double().default(0.8)
 
     override fun strategy(repository: Repository) = ConditionalProbability(
-            repository,
-            Cache(cacheDirectory),
-            DevaluationReducer(alpha))
+        repository,
+        Cache(cacheDirectory),
+        DevaluationReducer(alpha))
 }
 
 private class PrioritizeBloom : PrioritizeCommand(
@@ -107,8 +108,23 @@ private class PrioritizeBloom : PrioritizeCommand(
     val expectedInsertions by option("--insertions").int().default(100)
 
     override fun strategy(repository: Repository) = Bloom(
-                    repository,
-                    Cache(cacheDirectory),
-                    DevaluationReducer(alpha),
-                    expectedInsertions)
+        repository,
+        Cache(cacheDirectory),
+        DevaluationReducer(alpha),
+        expectedInsertions)
+}
+
+private class PrioritizeRecentlyChanged : PrioritizeCommand(
+        name = "matrix-recently-changed",
+        help = "Prioritize recently changed files"
+) {
+    val cacheDirectory by option("--cache").file(fileOkay = false).default(File("cache"))
+    val alpha by option("--alpha").double().default(0.8)
+
+    override fun strategy(repository: Repository) = RecentlyChanged(
+        repository,
+        Cache(cacheDirectory),
+        DevaluationReducer(alpha),
+        alpha
+    )
 }
