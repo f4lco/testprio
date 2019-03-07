@@ -28,7 +28,7 @@ object MavenLogParser : Parser {
 
     private val testNamePattern = "Running (\\w+(\\.\\w+)*)".toRegex(RegexOption.MULTILINE)
 
-    private val testResultPattern = "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+), Time elapsed: (.+?) sec".toRegex()
+    private val testResultPattern = "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+), Time elapsed: ([.,\\d]+?) sec".toRegex()
 
     override fun parseFile(logFile: LogFile): Sequence<TestResult> {
         val content = logFile.source.readText()
