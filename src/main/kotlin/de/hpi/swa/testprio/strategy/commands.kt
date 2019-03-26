@@ -17,7 +17,9 @@ object StrategyCommands {
             PrioritizeLRU(),
             PrioritizeRecentlyFailed(),
             PrioritizePathTCOverlap(),
-            PrioritizeGraph()
+            PrioritizeGraph(),
+            PrioritizeOptimalFailures(),
+            PrioritizeOptimalFailuresPerDuration()
     ) + MatrixCommands.get()
 
     fun get() = commands
@@ -69,4 +71,18 @@ private class PrioritizeGraph : PrioritizeCommand(
     val graphPassword by option("--graph-pw", envvar = "NEO4J_PASS").required()
 
     override fun strategy(repository: Repository) = Graph(graphHost, graphUser, graphPassword)
+}
+
+private class PrioritizeOptimalFailures : PrioritizeCommand(
+        name = "optimal-failure",
+        help = "Prioritize TC revealing many faults"
+) {
+    override fun strategy(repository: Repository) = Optimal.byFailureCount()
+}
+
+private class PrioritizeOptimalFailuresPerDuration : PrioritizeCommand(
+    name = "optimal-failure-duration",
+    help = "Prioritize TC with optimal ratio of failures to duration"
+) {
+    override fun strategy(repository: Repository) = Optimal.byFailuresPerDuration()
 }
