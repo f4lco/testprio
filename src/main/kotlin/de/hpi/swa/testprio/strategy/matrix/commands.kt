@@ -19,7 +19,8 @@ object MatrixCommands {
         PrioritizeTestCaseSimilarity(),
         PrioritizeConditionalProbability(),
         PrioritizeBloom(),
-        PrioritizeRecentlyChanged()
+        PrioritizeRecentlyChanged(),
+        PrioritizeNMF()
     )
 
     fun get() = commands
@@ -126,5 +127,19 @@ private class PrioritizeRecentlyChanged : PrioritizeCommand(
         Cache(cacheDirectory),
         DevaluationReducer(alpha),
         alpha
+    )
+}
+
+private class PrioritizeNMF : PrioritizeCommand(
+        name = "matrix-nmf",
+        help = "Use NMF"
+) {
+    val cacheDirectory by option("--cache").file(fileOkay = false).default(File("cache"))
+    val alpha by option("--alpha").double().default(0.8)
+
+    override fun strategy(repository: Repository) = NMF(
+        repository,
+        Cache(cacheDirectory),
+        DevaluationReducer(alpha)
     )
 }
