@@ -16,11 +16,7 @@ class TestRepository : Repository {
 
     fun jobs() = (changedFiles.keys + testResults.keys).toList().sorted()
 
-    override fun jobs(projectName: String): List<String> = jobs()
-
     override fun redJobs(projectName: String) = TODO()
-
-    override fun firstRedJobs(projectName: String) = TODO()
 
     override fun changedFiles(jobId: String): MutableList<String> = changedFiles.computeIfAbsent(jobId) { mutableListOf() }
 

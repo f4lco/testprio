@@ -4,11 +4,7 @@ import org.jooq.DSLContext
 
 class DatabaseRepository(val context: DSLContext, val patchTable: String) : Repository {
 
-    override fun jobs(projectName: String) = Projects.jobIdsOf(context, projectName)
-
     override fun redJobs(projectName: String) = Projects.redJobIdsOf(context, projectName)
-
-    override fun firstRedJobs(projectName: String) = Projects.firstFailuresOf(context, projectName)
 
     override fun changedFiles(jobId: String) = Patches.selectPatches(context, jobId, patchTable)
 
