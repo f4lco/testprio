@@ -1,6 +1,6 @@
 package de.hpi.swa.testprio.strategy
 
-import de.hpi.swa.testprio.parser.CsvOutput
+import de.hpi.swa.testprio.parser.PrioritizationResultOutput
 import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Job
 import de.hpi.swa.testprio.probe.Repository
@@ -46,7 +46,7 @@ class StrategyRunner(val repository: Repository) {
 
         ProgressBar("Builds", builds.size.toLong()).use { progress ->
             val results = processBuilds(builds, strategy).onEach { progress.step() }
-            CsvOutput.writeSeq(results, output)
+            PrioritizationResultOutput.write(results, output)
         }
 
         if (strategy is AutoCloseable) {
@@ -66,7 +66,7 @@ class StrategyRunner(val repository: Repository) {
     private fun processBuild(jobs: List<Job>, priorJobs: List<Job>, strategy: PrioritisationStrategy) = sequence {
         for (job in jobs) {
             LOG.debug { "Reorder job $job" }
-            yield(job.job.toString() to reorderJob(job, priorJobs, strategy))
+            yield(job to reorderJob(job, priorJobs, strategy))
         }
 
         for (job in jobs) {

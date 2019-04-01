@@ -24,7 +24,7 @@ class LogParser(private val parser: Parser) {
                 result
             }
 
-            CsvOutput.write(results, to)
+            ParseResultOutput.write(results, to)
         }
     }
 

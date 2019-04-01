@@ -6,7 +6,9 @@ data class Job(
     val buildNumber: Int,
     val build: Int,
     val job: Int
-)
+) {
+    companion object
+}
 
 interface Repository {
 
