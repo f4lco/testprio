@@ -2,8 +2,10 @@ package de.hpi.swa.testprio.strategy
 
 import de.hpi.swa.testprio.parser.CsvOutput
 import de.hpi.swa.testprio.parser.TestResult
+import de.hpi.swa.testprio.probe.Job
 import de.hpi.swa.testprio.probe.Repository
 import me.tongfei.progressbar.ProgressBar
+import mu.KotlinLogging
 import java.io.File
 
 class Params(
@@ -21,10 +23,18 @@ class Params(
 
 interface PrioritisationStrategy {
 
-    fun apply(p: Params): List<TestResult>
+    fun reorder(p: Params): List<TestResult>
+
+    fun acceptFailedRun(p: Params) {
+        // Do nothing by default
+    }
 }
 
 class StrategyRunner(val repository: Repository) {
+
+    companion object {
+        val LOG = KotlinLogging.logger { }
+    }
 
     fun run(
         projectName: String,
@@ -32,13 +42,10 @@ class StrategyRunner(val repository: Repository) {
         output: File
     ) {
 
-        val jobIds = repository.redJobs(projectName)
-        ProgressBar("Jobs", jobIds.size.toLong()).use {
-            val results = jobIds.asSequence().map { jobId ->
-                val results = processJob(jobId, jobIds, strategy)
-                it.step()
-                Pair(jobId, results)
-            }
+        val builds = repository.redJobs(projectName).groupBy { it.build }
+
+        ProgressBar("Builds", builds.size.toLong()).use { progress ->
+            val results = processBuilds(builds, strategy).onEach { progress.step() }
             CsvOutput.writeSeq(results, output)
         }
 
@@ -47,9 +54,44 @@ class StrategyRunner(val repository: Repository) {
         }
     }
 
-    private fun processJob(jobId: String, jobIds: List<String>, strategy: PrioritisationStrategy): List<TestResult> {
-        val params = Params(jobId, jobIds, repository)
-        return ensureIndexed(strategy.apply(params))
+    private fun processBuilds(builds: Map<Int, List<Job>>, strategy: PrioritisationStrategy) = sequence {
+        val priorJobs = mutableListOf<Job>()
+        for ((build, jobGroup) in builds) {
+            LOG.debug { "Processing build $build (${jobGroup.size} jobs)" }
+            yieldAll(processBuild(jobGroup, priorJobs, strategy))
+            priorJobs += jobGroup
+        }
+    }
+
+    private fun processBuild(jobs: List<Job>, priorJobs: List<Job>, strategy: PrioritisationStrategy) = sequence {
+        for (job in jobs) {
+            LOG.debug { "Reorder job $job" }
+            yield(job.job.toString() to reorderJob(job, priorJobs, strategy))
+        }
+
+        for (job in jobs) {
+            LOG.debug { "Apply state for job $job" }
+            advanceState(job, priorJobs, strategy)
+        }
+    }
+
+    private fun reorderJob(job: Job, priorJobs: List<Job>, strategy: PrioritisationStrategy): List<TestResult> {
+        val params = newParams(job, priorJobs)
+        return ensureIndexed(strategy.reorder(params))
+    }
+
+    private fun advanceState(job: Job, priorJobs: List<Job>, strategy: PrioritisationStrategy) {
+        val params = newParams(job, priorJobs)
+        strategy.acceptFailedRun(params)
+    }
+
+    private fun newParams(job: Job, priorJobs: List<Job>): Params {
+        val jobId: String = job.job.toString()
+        return Params(
+            jobId,
+            priorJobs.map { it.job.toString() } + jobId,
+            repository
+        )
     }
 
     private fun ensureIndexed(tr: List<TestResult>) = tr.mapIndexed { index, t -> t.copy(index = index) }

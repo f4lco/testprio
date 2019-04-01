@@ -35,6 +35,8 @@ dependencies {
     implementation("org.tinylog:slf4j-binding:1.3.5")
 
     testImplementation("io.strikt:strikt-core:0.17.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:2.25.1")
+    testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.4.0")
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.4.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.4.0")

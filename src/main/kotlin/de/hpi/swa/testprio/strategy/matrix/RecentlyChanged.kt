@@ -20,9 +20,9 @@ class RecentlyChanged(
 ) : PrioritisationStrategy {
 
     private val unitMatrix = UnitMatrix(repository, cache)
-    private val history = mutableMapOf<String, BitSet>()
+    private val histories = mutableMapOf<String, BitSet>()
 
-    override fun apply(p: Params): List<TestResult> {
+    override fun reorder(p: Params): List<TestResult> {
         val unitMatrices = selectJobs(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 
@@ -30,19 +30,22 @@ class RecentlyChanged(
 
         val testPriorities = p.testResults.associateWith { tc ->
             sumMatrix.matrix
-                .filterKeys { it.testName == tc.name }
-                .map { filePriorities.getOrDefault(it.key.fileName, 0.0) * it.value.toDouble() }
-                .sum()
+                    .filterKeys { it.testName == tc.name }
+                    .map { filePriorities.getOrDefault(it.key.fileName, 0.0) * it.value.toDouble() }
+                    .sum()
         }
 
-        p.changedFiles.forEach { history.computeIfAbsent(it) { BitSet() }.set(p.jobIndex) }
         return p.testResults.sortedByDescending { testPriorities[it] }
+    }
+
+    override fun acceptFailedRun(p: Params) {
+        p.changedFiles.forEach { histories.computeIfAbsent(it) { BitSet() }.set(p.jobIndex) }
     }
 
     private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 
     private fun similarity(p: Params, fileName: String): Double {
-        return getValue(history.computeIfAbsent(fileName) { BitSet() }, p)
+        return getValue(histories.computeIfAbsent(fileName) { BitSet() }, p)
     }
 
     private fun getValue(history: BitSet, p: Params): Double {

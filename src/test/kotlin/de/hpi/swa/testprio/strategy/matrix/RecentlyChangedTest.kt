@@ -31,9 +31,9 @@ class RecentlyChangedTest {
             loadTestResult("repeated-failure.csv")
         }
 
-        strategy.apply(Params("1", repository.jobs(), repository))
+        strategy.acceptFailedRun(Params("1", repository.jobs(), repository))
 
-        val result = strategy.apply(Params("2", repository.jobs(), repository))
+        val result = strategy.reorder(Params("2", repository.jobs(), repository))
 
         expectThat(result).hasTestOrder("tc1", "tc0")
     }

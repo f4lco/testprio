@@ -8,24 +8,29 @@ import java.util.BitSet
  */
 class RecentlyFailedStrategy(val alpha: Double) : PrioritisationStrategy {
 
-    private val history = mutableMapOf<String, BitSet>()
+    private val histories = mutableMapOf<String, BitSet>()
 
-    override fun apply(p: Params): List<TestResult> {
+    override fun reorder(p: Params): List<TestResult> {
 
         val priorities = mutableMapOf<String, Double>()
 
         for (tc in p.testResults) {
-            val history = history.computeIfAbsent(tc.name) { BitSet(p.jobIds.size) }
-
+            val history = historyFor(tc)
             priorities[tc.name] = getValue(history, p)
-
-            if (tc.red > 0) {
-                history.set(p.jobIndex)
-            }
         }
 
         return p.testResults.sortedByDescending { priorities[it.name] }
     }
+
+    override fun acceptFailedRun(p: Params) {
+        for (tc in p.testResults) {
+            if (tc.red > 0) {
+                historyFor(tc).set(p.jobIndex)
+            }
+        }
+    }
+
+    private fun historyFor(tc: TestResult) = histories.computeIfAbsent(tc.name) { BitSet() }
 
     private fun getValue(history: BitSet, p: Params): Double {
         var prob: Double = historyAt(history, 0)
