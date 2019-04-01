@@ -11,7 +11,6 @@ class RecentlyFailedStrategy(val alpha: Double) : PrioritisationStrategy {
     private val histories = mutableMapOf<String, BitSet>()
 
     override fun reorder(p: Params): List<TestResult> {
-
         val priorities = mutableMapOf<String, Double>()
 
         for (tc in p.testResults) {

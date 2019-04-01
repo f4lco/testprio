@@ -19,11 +19,8 @@ class ConditionalProbability(
 
         val fileCounts = fileCounts(sumMatrix)
 
-        val probabilities = p.testResults.associateWith {
-            prob(p,
-                    sumMatrix,
-                    fileCounts,
-                    it)
+        val probabilities = p.testResults.associateWith { tc ->
+            prob(p, sumMatrix, fileCounts, tc)
         }
 
         return p.testResults.sortedByDescending { probabilities[it] }

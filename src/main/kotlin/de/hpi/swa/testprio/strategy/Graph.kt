@@ -10,8 +10,8 @@ class Graph(
     graphPassword: String
 ) : PrioritisationStrategy, AutoCloseable {
 
-    val driver = GraphDatabase.driver(graphHost, AuthTokens.basic(graphUser, graphPassword))
-    val session = driver.session()
+    private val driver = GraphDatabase.driver(graphHost, AuthTokens.basic(graphUser, graphPassword))
+    private val session = driver.session()
 
     init {
         updateSchema()

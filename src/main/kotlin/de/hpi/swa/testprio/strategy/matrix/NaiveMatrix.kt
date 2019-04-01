@@ -31,7 +31,6 @@ class NaiveMatrix(
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 
         return p.testResults.sortedByDescending { test ->
-
             sumMatrix.matrix.filterKeys { key ->
                 key.testName == test.name && key.fileName in p.changedFiles
             }.values.sum()
