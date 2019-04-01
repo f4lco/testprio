@@ -15,7 +15,7 @@ class PathTestCaseOverlap(val similarity: SimilarityScore<Int> = LongestCommonSu
 
     private val nonWordChars = "\\W".toRegex()
 
-    override fun apply(p: Params): List<TestResult> {
+    override fun reorder(p: Params): List<TestResult> {
         return p.testResults.sortedByDescending {
             overlap(p.changedFiles, it.name)
         }

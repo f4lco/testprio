@@ -31,7 +31,7 @@ class Optimal private constructor(private val comparator: Comparator<TestResult>
         })
     }
 
-    override fun apply(p: Params): List<TestResult> {
+    override fun reorder(p: Params): List<TestResult> {
         return p.testResults.sortedWith(comparator)
     }
 }

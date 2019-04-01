@@ -21,7 +21,7 @@ class FileFailureDistributionSimilarity(
 
     private val unitMatrix = UnitMatrix(repository, cache)
 
-    override fun apply(p: Params): List<TestResult> {
+    override fun reorder(p: Params): List<TestResult> {
         val unitMatrices = selectJobs(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 

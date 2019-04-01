@@ -25,7 +25,7 @@ class Graph(
         }
     }
 
-    override fun apply(p: Params): List<TestResult> {
+    override fun reorder(p: Params): List<TestResult> {
         val priorities = p.testResults.associateWith { tc ->
 
             val statement = """

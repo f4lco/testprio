@@ -11,8 +11,7 @@ class LeastRecentlyUsedStrategy : PrioritisationStrategy {
 
     private val lastOrder = mutableMapOf<String, Int>()
 
-    override fun apply(p: Params): List<TestResult> {
-
+    override fun reorder(p: Params): List<TestResult> {
         val (kept, added) = p.testResults.partition { it.name in lastOrder.keys }
 
         val newOrder = mutableMapOf<String, Int>()

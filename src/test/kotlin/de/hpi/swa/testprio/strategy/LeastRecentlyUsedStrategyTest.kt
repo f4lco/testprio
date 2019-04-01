@@ -19,7 +19,7 @@ class LeastRecentlyUsedStrategyTest {
     @Test
     fun `first iteration leaves ordered unchanged`() {
         repository.loadTestResult("repeated-failure.csv")
-        val result = strategy.apply(params("1"))
+        val result = strategy.reorder(params("1"))
 
         expectThat(result).hasTestOrder("tc0", "tc1")
     }
@@ -28,8 +28,8 @@ class LeastRecentlyUsedStrategyTest {
     fun `second iteration demotes the first test of the prior run`() {
         repository.loadTestResult("repeated-failure.csv")
 
-        strategy.apply(params("1"))
-        val result = strategy.apply(params("2"))
+        strategy.reorder(params("1"))
+        val result = strategy.reorder(params("2"))
 
         expectThat(result).hasTestOrder("tc1", "tc0")
     }
@@ -38,8 +38,8 @@ class LeastRecentlyUsedStrategyTest {
     fun `added test cases are executed first`() {
         repository.loadTestResult("added-tc.csv")
 
-        strategy.apply(params("1"))
-        val result = strategy.apply(params("2"))
+        strategy.reorder(params("1"))
+        val result = strategy.reorder(params("2"))
 
         expectThat(result).hasTestOrder("addedTC", "tc1", "tc0")
     }
@@ -48,8 +48,8 @@ class LeastRecentlyUsedStrategyTest {
     fun `removed test cases are ignored`() {
         repository.loadTestResult("removed-tc.csv")
 
-        strategy.apply(params("1"))
-        val result = strategy.apply(params("2"))
+        strategy.reorder(params("1"))
+        val result = strategy.reorder(params("2"))
 
         expectThat(result).hasTestOrder("tc1", "tc0")
     }

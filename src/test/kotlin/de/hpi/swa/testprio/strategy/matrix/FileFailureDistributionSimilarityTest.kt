@@ -28,7 +28,7 @@ class FileFailureDistributionSimilarityTest {
             loadChangedFiles("repeated-change.csv")
         }
 
-        val result = strategy.apply(params("2"))
+        val result = strategy.reorder(params("2"))
 
         expectThat(result).hasTestOrder("tc1", "tc0")
     }

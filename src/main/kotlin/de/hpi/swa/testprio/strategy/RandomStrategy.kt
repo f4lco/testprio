@@ -9,5 +9,5 @@ class RandomStrategy(seed: Int) : PrioritisationStrategy {
 
     private val random = Random(seed)
 
-    override fun apply(p: Params) = p.testResults.shuffled(random)
+    override fun reorder(p: Params) = p.testResults.shuffled(random)
 }

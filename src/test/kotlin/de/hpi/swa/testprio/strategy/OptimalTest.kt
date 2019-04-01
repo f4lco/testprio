@@ -24,7 +24,7 @@ class OptimalTest {
     fun failures(job: String) {
         repository.loadTestResult("repeated-failure.csv")
 
-        val result = Optimal.byFailureCount().apply(params(job))
+        val result = Optimal.byFailureCount().reorder(params(job))
 
         expectThat(result) {
             hasSize(2)
@@ -37,7 +37,7 @@ class OptimalTest {
     fun failuresPerDurationUnchanged() {
         repository.loadTestResult("failures-duration.csv")
 
-        val result = Optimal.byFailuresPerDuration().apply(params("1"))
+        val result = Optimal.byFailuresPerDuration().reorder(params("1"))
 
         expectThat(result) {
             hasSize(2)
@@ -50,7 +50,7 @@ class OptimalTest {
     fun failuresPerDurationChanged() {
         repository.loadTestResult("failures-duration.csv")
 
-        val result = Optimal.byFailuresPerDuration().apply(params("2"))
+        val result = Optimal.byFailuresPerDuration().reorder(params("2"))
 
         expectThat(result) {
             hasSize(2)

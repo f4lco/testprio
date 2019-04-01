@@ -23,7 +23,7 @@ class PathTestCaseOverlapTest {
             loadChangedFiles("cars-files.csv")
         }
 
-        val result = strategy.apply(Params("1", repository.jobs(), repository))
+        val result = strategy.reorder(Params("1", repository.jobs(), repository))
 
         expectThat(result).hasTestOrder("Car", "ca", "C", "z", "y", "x")
     }

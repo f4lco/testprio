@@ -28,7 +28,7 @@ class PathSimilarityTest {
             loadChangedFiles("similar-filenames.csv")
         }
 
-        val result = strategy.apply(Params("3", repository.jobs(), repository))
+        val result = strategy.reorder(Params("3", repository.jobs(), repository))
 
         expectThat(result).hasTestOrder("tc1", "tc0")
     }

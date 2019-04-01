@@ -27,7 +27,7 @@ class NMFTest {
             loadChangedFiles("files-ascending.csv")
         }
 
-        val result = strategy.apply(Params("4", repository.jobs(), repository))
+        val result = strategy.reorder(Params("4", repository.jobs(), repository))
 
         expectThat(result).hasTestOrder("C", "B", "A")
     }
