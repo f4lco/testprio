@@ -1,4 +1,4 @@
-# Example configuration for executing test prioritisation
+# Example configuration for executing test prioritization
 
 # Database password
 export PRIO_PW=""

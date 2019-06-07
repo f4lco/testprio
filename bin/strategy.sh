@@ -1,19 +1,21 @@
 #!/bin/bash
-set -e
+set -eu
 
 . .testprio
 
+# Run a single strategy on different GitHub projects.
+#
+# Example invocation:
+# ./strategy.sh lru facebook buck
+#
+# Example with xargs:
+# xargs -t -n2 ./strategy.sh lru <data/projects
+
 strategy=$1
+owner=$2
+repo=$3
 
-function run() {
-  java -jar $PRIO_JAR $strategy --project $1 --user ma --output results/$2-$strategy.csv
-}
-
-run apache/sling sling
-run CloudifySource/cloudify cloudify
-run eclipse/jetty.project jetty
-run facebook/buck buck
-run jOOQ/jOOQ jooq
-run jsprit/jsprit jsprit
-run SonarSource/sonarqube sonarqube
-run square/okhttp okhttp
+java -jar $PRIO_JAR ${strategy} \
+  --project ${owner}/${repo} \
+  --user ma \
+  --output results/${owner}@${repo}/baseline/${repo}@${strategy}.csv

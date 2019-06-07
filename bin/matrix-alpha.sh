@@ -1,5 +1,7 @@
 #!/bin/bash
-source .testprio
+set -eu
+
+. .testprio
 
 seq 0 0.1 1 | xargs -t -Ivalue java -jar $PRIO_JAR \
   matrix-naive \

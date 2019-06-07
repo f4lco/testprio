@@ -1,0 +1,14 @@
+untreated
+optimal-failure
+optimal-failure-duration
+random
+lru
+recently-failed
+path-tc-overlap
+matrix-naive
+matrix-path-similarity
+matrix-file-similarity
+matrix-tc-similarity
+matrix-conditional-prob
+matrix-recently-changed
+bloom

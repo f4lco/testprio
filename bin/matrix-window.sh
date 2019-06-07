@@ -1,6 +1,7 @@
 #!/bin/bash
+set -eu
 
-source .testprio
+. .testprio
 
 # okhttp has 598 observations
 seq 0 20 600 | xargs -t -IwindowSize java -jar $PRIO_JAR \

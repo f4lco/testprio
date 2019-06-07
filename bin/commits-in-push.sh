@@ -11,7 +11,9 @@ function run() {
   java -jar $PRIO_JAR ${strategy} \
     --project ${owner}/${repo} \
     --user ma \
-    --output results/${owner}@${repo}/baseline/${repo}@offender-${strategy}.csv
+    --cache cache-tr-git-commits-in-push \
+    --patches "tr_commits_in_push" \
+    --output results/${owner}@${repo}/baseline/${repo}@push-${strategy}.csv
 }
 
 while IFS= read -r project; do
@@ -19,3 +21,5 @@ while IFS= read -r project; do
     run ${strategy} ${project}
   done <data/strategies-matrix
 done <data/projects
+
+
