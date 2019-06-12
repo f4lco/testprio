@@ -16,14 +16,15 @@ class ConditionalProbability(
     override fun reorder(p: Params): List<TestResult> {
         val unitMatrices = selectJobs(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
+        val probabilities = probabilities(p.changedFiles, p.testResults.map { it.name }, sumMatrix)
+        return p.testResults.sortedByDescending { probabilities[it.name] }
+    }
 
+    internal fun probabilities(changedFiles: List<String>, tests: List<String>, sumMatrix: Matrix): Map<String, Double> {
         val fileCounts = fileCounts(sumMatrix)
-
-        val probabilities = p.testResults.associateWith { tc ->
-            prob(p, sumMatrix, fileCounts, tc)
+        return tests.associateWith { tc ->
+            prob(changedFiles, sumMatrix, fileCounts, tc)
         }
-
-        return p.testResults.sortedByDescending { probabilities[it] }
     }
 
     private fun selectJobs(p: Params) = p.jobIds.subList(0, p.jobIndex)
@@ -41,15 +42,15 @@ class ConditionalProbability(
     }
 
     private fun prob(
-        p: Params,
+        changedFiles: List<String>,
         m: Matrix,
         fileCounts: Map<String, Pair<Double, Double>>,
-        tc: TestResult
+        tc: String
     ): Double {
 
-        return p.changedFiles.map { file ->
+        return changedFiles.map { file ->
             val (fileCount, fileProbability) = fileCounts[file] ?: Pair(0.0, 0.0)
-            val count = m.matrix[Key(file, tc.name)] ?: 0
+            val count = m.matrix[Key(file, tc)] ?: 0
             fileProbability * (count / fileCount)
         }.sum()
     }

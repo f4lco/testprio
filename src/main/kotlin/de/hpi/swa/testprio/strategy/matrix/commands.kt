@@ -48,12 +48,10 @@ private class PrioritizeFileSimilarity : PrioritizeCommand(
 ) {
     val cacheDirectory by option("--cache").file(fileOkay = false).default(File("cache"))
     val alpha by option("--alpha").double().default(0.8)
-    val prior by option("--prior").double().default(0.8)
 
     override fun strategy(repository: Repository) = FileFailureDistributionSimilarity(
         repository,
         Cache(cacheDirectory),
-        prior,
         DevaluationReducer(alpha))
 }
 
@@ -76,12 +74,10 @@ private class PrioritizeTestCaseSimilarity : PrioritizeCommand(
 ) {
     val cacheDirectory by option("--cache").file(fileOkay = false).default(File("cache"))
     val alpha by option("--alpha").double().default(0.8)
-    val prior by option("--prior").double().default(0.8)
 
     override fun strategy(repository: Repository) = TestCaseFailureDistributionSimilarity(
         repository,
         Cache(cacheDirectory),
-        prior,
         DevaluationReducer(alpha))
 }
 

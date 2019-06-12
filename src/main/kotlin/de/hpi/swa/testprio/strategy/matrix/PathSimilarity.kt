@@ -27,8 +27,7 @@ class PathSimilarity(
     override fun reorder(p: Params): List<TestResult> {
         val unitMatrices = selectJobs(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
-
-        val priorities = sumMatrix.fileNames().associateWith { similarity(p, it) }
+        val priorities = priorities(p.changedFiles, sumMatrix)
 
         return p.testResults.sortedByDescending { tc ->
 
@@ -39,9 +38,13 @@ class PathSimilarity(
         }
     }
 
+    internal fun priorities(changedFiles: List<String>, m: Matrix): Map<String, Double> {
+        return m.fileNames().associateWith { similarity(changedFiles, it) }
+    }
+
     private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 
-    private fun similarity(p: Params, fileName: String): Double {
-        return p.changedFiles.map { similarity.apply(it, fileName).toDouble() }.max() ?: 1.0
+    private fun similarity(changedFiles: List<String>, fileName: String): Double {
+        return changedFiles.map { similarity.apply(it, fileName).toDouble() }.max() ?: 1.0
     }
 }

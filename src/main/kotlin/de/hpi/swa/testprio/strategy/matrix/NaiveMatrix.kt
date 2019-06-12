@@ -29,10 +29,14 @@ class NaiveMatrix(
     override fun reorder(p: Params): List<TestResult> {
         val unitMatrices = selectJobsByWindowSize(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
+        val priorities = priority(sumMatrix, p.changedFiles)
+        return p.testResults.sortedByDescending { priorities(it.name) }
+    }
 
-        return p.testResults.sortedByDescending { test ->
-            sumMatrix.matrix.filterKeys { key ->
-                key.testName == test.name && key.fileName in p.changedFiles
+    internal fun priority(m: Matrix, changedFiles: List<String>): (String) -> Int {
+        return { testName ->
+            m.matrix.filterKeys { key ->
+                key.testName == testName && key.fileName in changedFiles
             }.values.sum()
         }
     }

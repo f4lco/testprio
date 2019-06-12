@@ -25,8 +25,7 @@ class RecentlyChanged(
     override fun reorder(p: Params): List<TestResult> {
         val unitMatrices = selectJobs(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
-
-        val filePriorities = sumMatrix.fileNames().associateWith { similarity(p, it) }
+        val filePriorities = priorities(p.jobIndex, sumMatrix)
 
         val testPriorities = p.testResults.associateWith { tc ->
             sumMatrix.matrix
@@ -44,15 +43,19 @@ class RecentlyChanged(
 
     private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 
-    private fun similarity(p: Params, fileName: String): Double {
-        return getValue(histories.computeIfAbsent(fileName) { BitSet() }, p)
+    internal fun priorities(jobIndex: Int, m: Matrix): Map<String, Double> {
+        return m.fileNames().associateWith { similarity(jobIndex, it) }
     }
 
-    private fun getValue(history: BitSet, p: Params): Double {
+    private fun similarity(jobIndex: Int, fileName: String): Double {
+        return getValue(histories.computeIfAbsent(fileName) { BitSet() }, jobIndex)
+    }
+
+    private fun getValue(history: BitSet, jobIndex: Int): Double {
         var prob: Double = historyAt(history, 0)
         var currentIndex = 1
 
-        while (currentIndex < p.jobIndex) {
+        while (currentIndex < jobIndex) {
             prob = alpha * historyAt(history, currentIndex) + (1 - alpha) * prob
             currentIndex += 1
         }

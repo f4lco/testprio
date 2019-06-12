@@ -1,5 +1,6 @@
 package de.hpi.swa.testprio.strategy.matrix
 
+import de.hpi.swa.testprio.strategy.Fixtures
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.TestRepository
 import hasTestOrder
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import strikt.api.expectThat
+import strikt.assertions.get
+import strikt.assertions.isEqualTo
 import java.io.File
 
 class PathSimilarityTest {
@@ -22,14 +25,21 @@ class PathSimilarityTest {
     }
 
     @Test
-    fun similarPathGetsPromoted() {
-        with(repository) {
-            loadTestResult("two-failing.csv")
-            loadChangedFiles("similar-filenames.csv")
+    fun testPriorities() {
+        val priorities = strategy.priorities(listOf("F1"), Fixtures.matrixOne())
+
+        expectThat(priorities) {
+            get("F1").isEqualTo(2.0)
+            get("F2").isEqualTo(1.0)
         }
+    }
+
+    @Test
+    fun similarPathGetsPromoted() {
+        repository.load(Fixtures.twoFailing())
 
         val result = strategy.reorder(Params("3", repository.jobs(), repository))
 
-        expectThat(result).hasTestOrder("tc1", "tc0")
+        expectThat(result).hasTestOrder("T1", "T2")
     }
 }

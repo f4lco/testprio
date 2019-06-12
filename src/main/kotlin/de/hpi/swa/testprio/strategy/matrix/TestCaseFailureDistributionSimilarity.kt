@@ -18,7 +18,6 @@ import de.hpi.swa.testprio.strategy.PrioritisationStrategy
 class TestCaseFailureDistributionSimilarity(
     repository: Repository,
     cache: Cache,
-    val prior: Double,
     val reducer: Reducer
 ) : PrioritisationStrategy {
 
@@ -28,47 +27,50 @@ class TestCaseFailureDistributionSimilarity(
         val unitMatrices = selectJobs(p).map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
 
-        val relevantTC: Set<String> = collectRelevantTC(p, sumMatrix)
-        val similarities: Map<TestResult, Double> = p.testResults.associateWith { tc ->
-            similarity(sumMatrix, relevantTC, tc.name)
-        }
+        val relevantTests: Set<String> = collectRelevantTests(p, sumMatrix)
+        val priorities = priorities(sumMatrix, relevantTests)
 
-        return p.testResults.sortedByDescending { similarities[it] }
+        return p.testResults.sortedByDescending { priorities[it.name] }
     }
 
     private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 
-    private fun collectRelevantTC(p: Params, m: Matrix): Set<String> {
+    private fun collectRelevantTests(p: Params, m: Matrix): Set<String> {
         return m.matrix.keys
                 .filter { it.fileName in p.changedFiles }
                 .map { it.testName }
                 .toSet()
     }
 
-    private fun similarity(m: Matrix, relevantTC: Set<String>, tc: String): Double {
-        return relevantTC.map { similarity(m, it, tc) }.min() ?: 0.0
+    internal fun priorities(m: Matrix, relevantTests: Set<String>): Map<String, Double> {
+        val testToSimilarity = similarities(m, relevantTests)
+
+        return m.testNames().associateWith { tc ->
+            m.matrix.filterKeys { it.testName == tc }.values.sum() * (testToSimilarity[tc] ?: 0.0)
+        }
     }
 
-    private fun similarity(m: Matrix, tc1: String, tc2: String): Double {
-        val distance = norm(tc1, m).toMutableMap()
-
-        for (entry in norm(tc2, m)) {
-            distance.merge(entry.key, entry.value, ::squaredError)
+    private fun similarities(m: Matrix, relevantTests: Set<String>): Map<String, Double> {
+        val testToDistance = m.testNames().associateWith { testName ->
+            distance(m, relevantTests, testName)
         }
 
-        return 1 - (distance.values.min() ?: 1.0)
+        val distances = testToDistance.values.sum()
+        return testToDistance.mapValues { 1 - it.value / distances }
     }
 
-    private fun norm(tc: String, m: Matrix): Map<String, Double> {
-        val allFiles: Set<String> = m.matrix.keys.map { it.fileName }.toSet()
+    private fun distance(m: Matrix, relevantTests: Set<String>, tc: String): Double {
+        return relevantTests.map { distance(m, it, tc) }.min() ?: 0.0
+    }
 
-        val counts = allFiles.associateWith { fileName ->
-            val failureCount = m.matrix[Key(fileName, tc)] ?: 0
-            prior + failureCount
-        }
+    private fun distance(m: Matrix, t1: String, t2: String): Double {
+        return norm(t1, m).zip(norm(t2, m)).map { (a, b) -> squaredError(a, b) }.sum()
+    }
 
-        val normalizer = counts.values.sum()
-        return counts.mapValues { entry -> entry.value / normalizer }
+    private fun norm(t: String, m: Matrix): List<Double> {
+        val distribution = m.fileDistribution(t)
+        val sum = distribution.sum()
+        return distribution.map { it / sum }
     }
 
     private fun squaredError(a: Double, b: Double) = Math.pow(a - b, 2.0)
