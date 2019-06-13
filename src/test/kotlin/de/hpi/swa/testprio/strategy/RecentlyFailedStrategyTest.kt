@@ -18,21 +18,21 @@ class RecentlyFailedStrategyTest {
 
     @Test
     fun `first iteration leaves order unchanged`() {
-        repository.loadTestResult("repeated-failure.csv")
+        repository.load(Fixtures.repeatedFailure())
 
         val result = strategy.reorder(params("1"))
 
-        expectThat(result).hasTestOrder("tc0", "tc1")
+        expectThat(result).hasTestOrder("T1", "T2")
     }
 
     @Test
     fun `second iteration promotes failure from previous run`() {
-        repository.loadTestResult("repeated-failure.csv")
+        repository.load(Fixtures.repeatedFailure())
 
         strategy.acceptFailedRun(params("1"))
         val result = strategy.reorder(params("2"))
 
-        expectThat(result).hasTestOrder("tc1", "tc0")
+        expectThat(result).hasTestOrder("T2", "T1")
     }
 
     private fun params(jobId: String) = Params(jobId, repository.jobs(), repository)

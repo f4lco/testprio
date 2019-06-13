@@ -50,7 +50,10 @@ class JobBuilder(
 
     fun failed(vararg names: String) = tests.addAll(names.map(TestResult.Companion::failed))
 
-    fun failed(name: String, failures: Int) {
-        tests.add(TestResult.failed(name).copy(failures = failures, errors = 0))
+    fun failed(name: String, failures: Int, duration: Double = DEFAULT_DURATION) {
+        tests.add(TestResult.failed(name).copy(
+            failures = failures,
+            errors = 0,
+            duration = duration.toBigDecimal()))
     }
 }

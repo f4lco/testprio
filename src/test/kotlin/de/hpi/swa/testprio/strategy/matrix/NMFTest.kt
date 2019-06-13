@@ -1,5 +1,6 @@
 package de.hpi.swa.testprio.strategy.matrix
 
+import de.hpi.swa.testprio.strategy.Fixtures
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.TestRepository
 import hasTestOrder
@@ -22,10 +23,7 @@ class NMFTest {
 
     @Test
     fun nmf() {
-        with(repository) {
-            loadTestResult("similar-tc.csv")
-            loadChangedFiles("files-ascending.csv")
-        }
+        repository.load(Fixtures.similarTests())
 
         val result = strategy.reorder(Params("4", repository.jobs(), repository))
 

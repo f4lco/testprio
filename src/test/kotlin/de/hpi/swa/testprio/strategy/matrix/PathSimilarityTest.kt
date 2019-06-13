@@ -3,6 +3,7 @@ package de.hpi.swa.testprio.strategy.matrix
 import de.hpi.swa.testprio.strategy.Fixtures
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.TestRepository
+import de.hpi.swa.testprio.strategy.revisions
 import hasTestOrder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -36,10 +37,28 @@ class PathSimilarityTest {
 
     @Test
     fun similarPathGetsPromoted() {
-        repository.load(Fixtures.twoFailing())
+        repository.load(twoFailing())
 
         val result = strategy.reorder(Params("3", repository.jobs(), repository))
 
         expectThat(result).hasTestOrder("T1", "T2")
+    }
+
+    private fun twoFailing() = revisions {
+
+        job {
+            changedFiles("/my/Car.java")
+            failed("T1", "T2")
+        }
+
+        job {
+            changedFiles("/path/to/my/Car.java")
+            failed("T1", "T2")
+        }
+
+        job {
+            changedFiles("/my/Car.java", "/path/to/my/Car.java")
+            failed("T1", "T2")
+        }
     }
 }

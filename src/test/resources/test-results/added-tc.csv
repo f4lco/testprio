@@ -1,6 +1,0 @@
-travisJobId,testName,index,duration,count,failures,errors,skipped
-1,tc0,0,0,42,0,0,0
-1,tc1,1,0,42,9,0,0
-2,tc0,0,0,42,0,0,0
-2,tc1,1,0,42,9,0,0
-2,addedTC,2,0,42,0,0,0

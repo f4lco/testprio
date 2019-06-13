@@ -22,7 +22,7 @@ class OptimalTest {
     @ParameterizedTest
     @ValueSource(strings = ["1", "2"])
     fun failures(job: String) {
-        repository.loadTestResult("repeated-failure.csv")
+        repository.load(Fixtures.repeatedFailure())
 
         val result = Optimal.byFailureCount().reorder(params(job))
 
@@ -35,7 +35,7 @@ class OptimalTest {
 
     @Test
     fun failuresPerDurationUnchanged() {
-        repository.loadTestResult("failures-duration.csv")
+        repository.load(failuresWithDuration())
 
         val result = Optimal.byFailuresPerDuration().reorder(params("1"))
 
@@ -48,7 +48,7 @@ class OptimalTest {
 
     @Test
     fun failuresPerDurationChanged() {
-        repository.loadTestResult("failures-duration.csv")
+        repository.load(failuresWithDuration())
 
         val result = Optimal.byFailuresPerDuration().reorder(params("2"))
 
@@ -56,6 +56,18 @@ class OptimalTest {
             hasSize(2)
             get(0).get { red }.isEqualTo(5)
             get(1).get { red }.isEqualTo(10)
+        }
+    }
+
+    private fun failuresWithDuration() = revisions {
+        job {
+            failed("tc0", failures = 5, duration = 1.0)
+            failed("tc1", failures = 10, duration = 1.0)
+        }
+
+        job {
+            failed("tc1", failures = 10, duration = 10.0)
+            failed("tc0", failures = 5, duration = 2.5)
         }
     }
 

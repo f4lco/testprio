@@ -18,13 +18,18 @@ class PathTestCaseOverlapTest {
 
     @Test
     fun `TC names with overlap to changed files are promoted`() {
-        with(repository) {
-            loadTestResult("cars-results.csv")
-            loadChangedFiles("cars-files.csv")
-        }
+        repository.load(fixture())
 
         val result = strategy.reorder(Params("1", repository.jobs(), repository))
 
         expectThat(result).hasTestOrder("Car", "ca", "C", "z", "y", "x")
+    }
+
+    private fun fixture() = revisions {
+        job {
+            changedFiles("Car.java")
+            successful("C", "ca", "Car")
+            successful("z", "y", "x")
+        }
     }
 }

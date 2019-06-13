@@ -18,25 +18,25 @@ class LeastRecentlyUsedStrategyTest {
 
     @Test
     fun `first iteration leaves ordered unchanged`() {
-        repository.loadTestResult("repeated-failure.csv")
+        repository.load(Fixtures.repeatedFailure())
         val result = strategy.reorder(params("1"))
 
-        expectThat(result).hasTestOrder("tc0", "tc1")
+        expectThat(result).hasTestOrder("T1", "T2")
     }
 
     @Test
     fun `second iteration demotes the first test of the prior run`() {
-        repository.loadTestResult("repeated-failure.csv")
+        repository.load(Fixtures.repeatedFailure())
 
         strategy.reorder(params("1"))
         val result = strategy.reorder(params("2"))
 
-        expectThat(result).hasTestOrder("tc1", "tc0")
+        expectThat(result).hasTestOrder("T2", "T1")
     }
 
     @Test
     fun `added test cases are executed first`() {
-        repository.loadTestResult("added-tc.csv")
+        repository.load(addedTestCase())
 
         strategy.reorder(params("1"))
         val result = strategy.reorder(params("2"))
@@ -44,14 +44,40 @@ class LeastRecentlyUsedStrategyTest {
         expectThat(result).hasTestOrder("addedTC", "tc1", "tc0")
     }
 
+    private fun addedTestCase() = revisions {
+        job {
+            successful("tc0")
+            failed("tc1")
+        }
+
+        job {
+            successful("tc0")
+            failed("tc1")
+            successful("addedTC")
+        }
+    }
+
     @Test
     fun `removed test cases are ignored`() {
-        repository.loadTestResult("removed-tc.csv")
+        repository.load(removedTestCase())
 
         strategy.reorder(params("1"))
         val result = strategy.reorder(params("2"))
 
         expectThat(result).hasTestOrder("tc1", "tc0")
+    }
+
+    private fun removedTestCase() = revisions {
+        job {
+            successful("tc0")
+            failed("tc1")
+            successful("removedTC")
+        }
+
+        job {
+            successful("tc0")
+            failed("tc1")
+        }
     }
 
     private fun params(jobId: String) = Params(jobId, repository.jobs(), repository)

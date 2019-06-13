@@ -4,9 +4,11 @@ import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.strategy.matrix.Key
 import de.hpi.swa.testprio.strategy.matrix.Matrix
 
+const val DEFAULT_DURATION = 42.0
+
 fun TestResult.Companion.successful(testName: String) = TestResult(testName,
             index = -1,
-            duration = 42.toBigDecimal(),
+            duration = DEFAULT_DURATION.toBigDecimal(),
             count = 10,
             failures = 0,
             errors = 0,
@@ -14,7 +16,7 @@ fun TestResult.Companion.successful(testName: String) = TestResult(testName,
 
 fun TestResult.Companion.failed(testName: String) = TestResult(testName,
         index = -1,
-        duration = 42.toBigDecimal(),
+        duration = DEFAULT_DURATION.toBigDecimal(),
         count = 10,
         failures = 3,
         errors = 1,
@@ -43,24 +45,6 @@ object Fixtures {
             changedFiles("Car.java")
             successful("T1")
             failed("T2")
-        }
-    }
-
-    fun twoFailing() = revisions {
-
-        job {
-            changedFiles("/my/Car.java")
-            failed("T1", "T2")
-        }
-
-        job {
-            changedFiles("/path/to/my/Car.java")
-            failed("T1", "T2")
-        }
-
-        job {
-            changedFiles("/my/Car.java", "/path/to/my/Car.java")
-            failed("T1", "T2")
         }
     }
 
