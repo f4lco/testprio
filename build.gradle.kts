@@ -4,7 +4,7 @@ plugins {
     id("org.jetbrains.kotlin.jvm").version("1.3.20")
     id("kotlinx-serialization").version("1.3.20")
     id("com.github.johnrengelman.shadow").version("4.0.4")
-    id("org.jlleitschuh.gradle.ktlint").version("7.0.0")
+    id("org.jlleitschuh.gradle.ktlint").version("8.0.0")
 }
 
 repositories {
@@ -22,7 +22,7 @@ dependencies {
     implementation("me.tongfei:progressbar:0.7.2")
     implementation("com.google.guava:guava:27.0.1-jre")
     implementation("org.neo4j.driver:neo4j-java-driver:1.7.2")
-    
+
     // Build from https://github.com/du-lab/nonnegative_matrix_factorization
     // and install into Maven local repository
     implementation("org.dulab:javanmf:1.0-SNAPSHOT")
