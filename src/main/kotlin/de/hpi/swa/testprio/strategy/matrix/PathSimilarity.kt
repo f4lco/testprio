@@ -25,8 +25,8 @@ class PathSimilarity(
     private val unitMatrix = UnitMatrix(repository, cache)
 
     override fun reorder(p: Params): List<TestResult> {
-        val unitMatrices = selectJobs(p).map(unitMatrix::get)
-        val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
+        val unitMatrices = p.priorJobs.map(unitMatrix::get)
+        val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
         val priorities = priorities(p.changedFiles, sumMatrix)
 
         return p.testResults.sortedByDescending { tc ->
@@ -41,8 +41,6 @@ class PathSimilarity(
     internal fun priorities(changedFiles: List<String>, m: Matrix): Map<String, Double> {
         return m.fileNames().associateWith { similarity(changedFiles, it) }
     }
-
-    private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 
     private fun similarity(changedFiles: List<String>, fileName: String): Double {
         return changedFiles.map { similarity.apply(it, fileName).toDouble() }.max() ?: 1.0

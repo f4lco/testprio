@@ -29,8 +29,8 @@ class NMF(
     private val unitMatrix = UnitMatrix(repository, cache)
 
     override fun reorder(p: Params): List<TestResult> {
-        val unitMatrices = selectJobs(p).map(unitMatrix::get)
-        val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
+        val unitMatrices = p.priorJobs.map(unitMatrix::get)
+        val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
 
         if (sumMatrix.matrix.isEmpty()) {
             return p.testResults
@@ -61,8 +61,6 @@ class NMF(
 
         return p.testResults.sortedBy { testPriorities[it] }
     }
-
-    private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 }
 
 private fun Matrix.toJblas(): DoubleMatrix {

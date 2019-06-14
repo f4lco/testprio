@@ -5,6 +5,7 @@ import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.TestRepository
 import de.hpi.swa.testprio.strategy.revisions
 import hasTestOrder
+import jobWithId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -17,10 +18,9 @@ class PathSimilarityTest {
 
     private lateinit var repository: TestRepository
     private lateinit var strategy: PathSimilarity
-    @TempDir lateinit var cache: File
 
     @BeforeEach
-    fun setUp() {
+    fun setUp(@TempDir cache: File) {
         repository = TestRepository()
         strategy = PathSimilarity(repository, Cache(cache), CountingReducer)
     }
@@ -39,7 +39,7 @@ class PathSimilarityTest {
     fun similarPathGetsPromoted() {
         repository.load(twoFailing())
 
-        val result = strategy.reorder(Params("3", repository.jobs(), repository))
+        val result = strategy.reorder(Params(jobWithId(3), repository.jobs(), repository))
 
         expectThat(result).hasTestOrder("T1", "T2")
     }

@@ -6,7 +6,7 @@ internal typealias Reducer = (Matrix, Matrix) -> Matrix
 
 object CountingReducer : Reducer {
     override fun invoke(left: Matrix, right: Matrix) =
-            Matrix(right.jobId, (left.matrix.keys + right.matrix.keys).associateWith {
+            Matrix((left.matrix.keys + right.matrix.keys).associateWith {
                 (left.matrix[it] ?: 0) + (right.matrix[it] ?: 0)
             })
 }
@@ -31,6 +31,6 @@ class DevaluationReducer(val alpha: Double) : Reducer {
             }
         }
 
-        return Matrix(right.jobId, m.mapValues { it.value.roundToInt() })
+        return Matrix(m.mapValues { it.value.roundToInt() })
     }
 }

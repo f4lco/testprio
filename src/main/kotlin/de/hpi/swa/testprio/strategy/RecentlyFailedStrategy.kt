@@ -1,6 +1,7 @@
 package de.hpi.swa.testprio.strategy
 
 import de.hpi.swa.testprio.parser.TestResult
+import de.hpi.swa.testprio.probe.Job
 import java.util.BitSet
 
 /**
@@ -24,7 +25,7 @@ class RecentlyFailedStrategy(val alpha: Double) : PrioritisationStrategy {
     override fun acceptFailedRun(p: Params) {
         for (tc in p.testResults) {
             if (tc.red > 0) {
-                historyFor(tc).set(p.jobIndex)
+                historyFor(tc).set(p.job.jobNumber)
             }
         }
     }
@@ -32,16 +33,14 @@ class RecentlyFailedStrategy(val alpha: Double) : PrioritisationStrategy {
     private fun historyFor(tc: TestResult) = histories.computeIfAbsent(tc.name) { BitSet() }
 
     private fun getValue(history: BitSet, p: Params): Double {
-        var prob: Double = historyAt(history, 0)
-        var currentIndex = 1
+        var prob: Double? = null
 
-        while (currentIndex < p.jobIndex) {
-            prob = alpha * historyAt(history, currentIndex) + (1 - alpha) * prob
-            currentIndex += 1
+        for (job in p.priorJobs) {
+            prob = alpha * historyAt(history, job) + (1 - alpha) * (prob ?: 0.0)
         }
 
-        return prob
+        return prob ?: 0.0
     }
 
-    private fun historyAt(history: BitSet, at: Int) = if (history[at]) 1.0 else 0.0
+    private fun historyAt(history: BitSet, job: Job) = if (history[job.jobNumber]) 1.0 else 0.0
 }

@@ -24,16 +24,14 @@ class TestCaseFailureDistributionSimilarity(
     private val unitMatrix = UnitMatrix(repository, cache)
 
     override fun reorder(p: Params): List<TestResult> {
-        val unitMatrices = selectJobs(p).map(unitMatrix::get)
-        val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
+        val unitMatrices = p.priorJobs.map(unitMatrix::get)
+        val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
 
         val relevantTests: Set<String> = collectRelevantTests(p, sumMatrix)
         val priorities = priorities(sumMatrix, relevantTests)
 
         return p.testResults.sortedByDescending { priorities[it.name] }
     }
-
-    private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
 
     private fun collectRelevantTests(p: Params, m: Matrix): Set<String> {
         return m.matrix.keys

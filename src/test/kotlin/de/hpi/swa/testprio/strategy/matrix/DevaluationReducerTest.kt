@@ -18,8 +18,8 @@ class DevaluationReducerTest {
 
     @Test
     fun noOverlap() {
-        val m = mapOf(Key("F1", "T1") to 1).toMatrix("A")
-        val n = mapOf(Key("F2", "T2") to 2).toMatrix("B")
+        val m = mapOf(Key("F1", "T1") to 1).toMatrix()
+        val n = mapOf(Key("F2", "T2") to 2).toMatrix()
 
         val reduced = reducer(m, n)
 
@@ -28,8 +28,8 @@ class DevaluationReducerTest {
 
     @Test
     fun oneOverlap() {
-        val m = mapOf(Key("F1", "T1") to 6).toMatrix("A")
-        val n = mapOf(Key("F1", "T1") to 2).toMatrix("B")
+        val m = mapOf(Key("F1", "T1") to 6).toMatrix()
+        val n = mapOf(Key("F1", "T1") to 2).toMatrix()
 
         val reduced = reducer(m, n)
 
@@ -41,9 +41,9 @@ class DevaluationReducerTest {
         val m = mapOf(
                 Key("F1", "T1") to 6,
                 Key("F1", "T2") to 10
-        ).toMatrix("A")
+        ).toMatrix()
 
-        val n = mapOf(Key("F1", "T1") to 1).toMatrix("B")
+        val n = mapOf(Key("F1", "T1") to 1).toMatrix()
 
         val reduced = reducer(m, n)
 
@@ -54,7 +54,7 @@ class DevaluationReducerTest {
         )
     }
 
-    private fun Map<Key, Int>.toMatrix(job: String) = Matrix(job, this)
+    private fun Map<Key, Int>.toMatrix() = Matrix(this)
 
     @Test
     fun testExample() {
@@ -74,7 +74,7 @@ class DevaluationReducerTest {
             Key("F1", "T2") to 6
         )
 
-        val reduced = DevaluationReducer(alpha = 0.8)(Matrix("M", m), Matrix("N", n))
+        val reduced = DevaluationReducer(alpha = 0.8)(Matrix(m), Matrix(n))
 
         reduced.print()
     }

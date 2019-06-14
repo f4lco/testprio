@@ -1,6 +1,7 @@
 package de.hpi.swa.testprio.strategy.matrix
 
 import de.hpi.swa.testprio.parser.TestResult
+import de.hpi.swa.testprio.probe.Job
 import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
@@ -23,9 +24,9 @@ class RecentlyChanged(
     private val histories = mutableMapOf<String, BitSet>()
 
     override fun reorder(p: Params): List<TestResult> {
-        val unitMatrices = selectJobs(p).map(unitMatrix::get)
-        val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
-        val filePriorities = priorities(p.jobIndex, sumMatrix)
+        val unitMatrices = p.priorJobs.map(unitMatrix::get)
+        val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
+        val filePriorities = priorities(p.priorJobs, sumMatrix)
 
         val testPriorities = p.testResults.associateWith { tc ->
             sumMatrix.matrix
@@ -38,30 +39,26 @@ class RecentlyChanged(
     }
 
     override fun acceptFailedRun(p: Params) {
-        p.changedFiles.forEach { histories.computeIfAbsent(it) { BitSet() }.set(p.jobIndex) }
+        p.changedFiles.forEach { histories.computeIfAbsent(it) { BitSet() }.set(p.job.jobNumber) }
     }
 
-    private fun selectJobs(p: Params): List<String> = p.jobIds.subList(0, p.jobIndex)
-
-    internal fun priorities(jobIndex: Int, m: Matrix): Map<String, Double> {
-        return m.fileNames().associateWith { similarity(jobIndex, it) }
+    internal fun priorities(priorJobs: List<Job>, m: Matrix): Map<String, Double> {
+        return m.fileNames().associateWith { similarity(priorJobs, it) }
     }
 
-    private fun similarity(jobIndex: Int, fileName: String): Double {
-        return getValue(histories.computeIfAbsent(fileName) { BitSet() }, jobIndex)
+    private fun similarity(priorJobs: List<Job>, fileName: String): Double {
+        return getValue(histories.computeIfAbsent(fileName) { BitSet() }, priorJobs)
     }
 
-    private fun getValue(history: BitSet, jobIndex: Int): Double {
-        var prob: Double = historyAt(history, 0)
-        var currentIndex = 1
+    private fun getValue(history: BitSet, priorJobs: List<Job>): Double {
+        var prob: Double? = null
 
-        while (currentIndex < jobIndex) {
-            prob = alpha * historyAt(history, currentIndex) + (1 - alpha) * prob
-            currentIndex += 1
+        for (job in priorJobs) {
+            prob = alpha * historyAt(history, job) + (1 - alpha) * (prob ?: 0.0)
         }
 
-        return prob
+        return prob ?: 0.0
     }
 
-    private fun historyAt(history: BitSet, at: Int) = if (history[at]) 1.0 else 0.0
+    private fun historyAt(history: BitSet, job: Job) = if (history[job.jobNumber]) 1.0 else 0.0
 }

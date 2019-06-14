@@ -1,12 +1,13 @@
 package de.hpi.swa.testprio.strategy.matrix
 
+import de.hpi.swa.testprio.probe.Job
 import mu.KotlinLogging
 import java.io.File
 
 class Cache(val directory: File) {
 
     private val LOG = KotlinLogging.logger {}
-    private val cache = mutableMapOf<String, Matrix>()
+    private val cache = mutableMapOf<Job, Matrix>()
 
     init {
         if (!directory.exists() && !directory.mkdirs()) {
@@ -14,23 +15,23 @@ class Cache(val directory: File) {
         }
     }
 
-    fun get(jobId: String, factory: (String) -> Matrix): Matrix {
-        return cache[jobId] ?: computeAndStore(jobId, factory)
+    fun get(job: Job, factory: (Job) -> Matrix): Matrix {
+        return cache[job] ?: computeAndStore(job, factory)
     }
 
-    private fun computeAndStore(jobId: String, factory: (String) -> Matrix): Matrix {
-        val matrix = loadFile(jobId) ?: fromFactory(jobId, factory)
-        cache[jobId] = matrix
+    private fun computeAndStore(job: Job, factory: (Job) -> Matrix): Matrix {
+        val matrix = loadFile(job) ?: fromFactory(job, factory)
+        cache[job] = matrix
         return matrix
     }
 
-    private fun cacheFileFor(jobId: String): File = File(directory, "$jobId.json")
+    private fun cacheFileFor(job: Job): File = File(directory, "${job.job}.json")
 
-    private fun loadFile(jobId: String): Matrix? = MatrixStore.read(cacheFileFor(jobId))
+    private fun loadFile(job: Job): Matrix? = MatrixStore.read(cacheFileFor(job))
 
-    private fun fromFactory(jobId: String, factory: (String) -> Matrix): Matrix {
-        val matrix = factory(jobId)
-        MatrixStore.write(matrix, cacheFileFor(jobId))
+    private fun fromFactory(job: Job, factory: (Job) -> Matrix): Matrix {
+        val matrix = factory(job)
+        MatrixStore.write(matrix, cacheFileFor(job))
         return matrix
     }
 }

@@ -4,6 +4,7 @@ import de.hpi.swa.testprio.strategy.Fixtures
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.TestRepository
 import hasTestOrder
+import jobWithId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -15,10 +16,9 @@ class NaiveMatrixTest {
 
     lateinit var strategy: NaiveMatrix
     lateinit var repository: TestRepository
-    @TempDir lateinit var cache: File
 
     @BeforeEach
-    fun setUp() {
+    fun setUp(@TempDir cache: File) {
         repository = TestRepository()
         strategy = NaiveMatrix(repository, Cache(cache), CountingReducer)
     }
@@ -36,10 +36,10 @@ class NaiveMatrixTest {
     fun `TC gets promoted due to previous failure with similar file changes`() {
         repository.load(Fixtures.repeatedFailure())
 
-        val result = strategy.reorder(params("2"))
+        val result = strategy.reorder(params(2))
 
         expectThat(result).hasTestOrder("T2", "T1")
     }
 
-    private fun params(jobId: String) = Params(jobId, repository.jobs(), repository)
+    private fun params(id: Int) = Params(jobWithId(id), repository.jobs(), repository)
 }

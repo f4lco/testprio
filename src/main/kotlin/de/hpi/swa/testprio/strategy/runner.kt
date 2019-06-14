@@ -10,21 +10,14 @@ import java.io.File
 import java.util.PriorityQueue
 
 class Params(
-    val jobId: String,
-    val jobIds: List<String>,
+    val job: Job,
+    val priorJobs: List<Job>,
     val repository: Repository
 ) {
 
-    val changedFiles: List<String> by lazy { repository.changedFiles(jobId) }
+    val changedFiles: List<String> by lazy { repository.changedFiles(job) }
 
-    val testResults: List<TestResult> by lazy { repository.testResults(jobId) }
-
-    // FIXME invent "job serial number" for indexing to bitsets
-    // Look at runner tests: multiple jobs may conclude they are at the same position
-    // Rename jobIds to priorJobs?
-    // Perhaps even jobIndex >= len(priorJobs) ???
-    // Consider "current" and "deferred" jobs / learning
-    val jobIndex by lazy { jobIds.indexOf(jobId) }
+    val testResults: List<TestResult> by lazy { repository.testResults(job) }
 }
 
 interface PrioritisationStrategy {
@@ -45,13 +38,14 @@ class StrategyRunner(val repository: Repository) {
     fun run(
         projectName: String,
         strategy: PrioritisationStrategy,
+        windowSize: Int?,
         output: File
     ) {
 
         val builds = repository.redJobs(projectName).groupBy { it.build }
 
         ProgressBar("Builds", builds.size.toLong()).use { progress ->
-            val results = processBuilds(builds, strategy).onEach { progress.step() }
+            val results = processBuilds(builds, strategy, windowSize).onEach { progress.step() }
             PrioritizationResultOutput.write(results, output)
         }
 
@@ -60,7 +54,7 @@ class StrategyRunner(val repository: Repository) {
         }
     }
 
-    private fun processBuilds(builds: Map<Int, List<Job>>, strategy: PrioritisationStrategy) = sequence {
+    private fun processBuilds(builds: Map<Int, List<Job>>, strategy: PrioritisationStrategy, windowSize: Int?) = sequence {
         val pending = PriorityQueue<PendingBuild>(compareBy { it.end })
         val priorJobs = mutableListOf<Job>()
 
@@ -78,7 +72,7 @@ class StrategyRunner(val repository: Repository) {
             }
 
             // Treat current build
-            val newBuild = PendingBuild(jobGroup, priorJobs.toList())
+            val newBuild = PendingBuild(jobGroup, jobBacklog(priorJobs, windowSize))
             LOG.debug { "Processing build $build (${jobGroup.size} jobs)" }
             yieldAll(processBuild(jobGroup, priorJobs, strategy))
             pending += newBuild
@@ -93,6 +87,10 @@ class StrategyRunner(val repository: Repository) {
             }
             priorJobs += priorBuild.jobs
         }
+    }
+
+    private fun jobBacklog(priorJobs: List<Job>, windowSize: Int?): List<Job> {
+        return if (windowSize == null) priorJobs.toList() else priorJobs.takeLast(windowSize)
     }
 
     data class PendingBuild(val jobs: List<Job>, val priorJobs: List<Job>) {
@@ -118,12 +116,7 @@ class StrategyRunner(val repository: Repository) {
     }
 
     private fun newParams(job: Job, priorJobs: List<Job>): Params {
-        val jobId: String = job.job.toString()
-        return Params(
-            jobId,
-            priorJobs.map { it.job.toString() } + jobId,
-            repository
-        )
+        return Params(job, priorJobs + job, repository)
     }
 
     private fun ensureIndexed(tr: List<TestResult>) = tr.mapIndexed { index, t -> t.copy(index = index) }

@@ -1,6 +1,7 @@
 package de.hpi.swa.testprio.probe
 
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.rowNumber
 import org.jooq.impl.DSL.field
 import org.jooq.impl.DSL.name
 import org.jooq.impl.DSL.table
@@ -15,6 +16,7 @@ object Projects {
         return context.select(
             field(name("tt", "tr_build_number")),
             field(name("tt", "tr_build_id")),
+            rowNumber().over().`as`(name("tr_job_number")).minus(1),
             field(name("tt", "tr_job_id")),
             field(name("tt", "gh_build_started_at")),
             field(name("tt", "tr_duration"))
@@ -32,6 +34,7 @@ object Projects {
             Job(
                 buildNumber = record["tr_build_number", Int::class.java],
                 build = record["tr_build_id", Int::class.java],
+                jobNumber = record["tr_job_number", Int::class.java],
                 job = record["tr_job_id", Int::class.java],
                 begin = begin,
                 end = begin.plusSeconds(record["tr_duration", Long::class.java])

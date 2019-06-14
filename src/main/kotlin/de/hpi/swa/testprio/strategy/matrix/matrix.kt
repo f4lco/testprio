@@ -3,7 +3,11 @@ package de.hpi.swa.testprio.strategy.matrix
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Matrix(val jobId: String, val matrix: Map<Key, Int>)
+data class Matrix(val matrix: Map<Key, Int>) {
+    companion object
+}
+
+fun Matrix.Companion.empty() = Matrix(emptyMap())
 
 fun Matrix.fileNames() = matrix.keys.map { it.fileName }.toSortedSet()
 

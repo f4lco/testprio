@@ -6,6 +6,7 @@ import de.hpi.swa.testprio.parser.TestResult
 data class Job(
     val buildNumber: Int,
     val build: Int,
+    val jobNumber: Int,
     val job: Int,
     val begin: Instant,
     val end: Instant
@@ -17,7 +18,7 @@ interface Repository {
 
     fun redJobs(projectName: String): List<Job>
 
-    fun changedFiles(jobId: String): List<String>
+    fun changedFiles(job: Job): List<String>
 
-    fun testResults(jobId: String): List<TestResult>
+    fun testResults(job: Job): List<TestResult>
 }

@@ -31,8 +31,8 @@ class Bloom(
     private val filters = mutableMapOf<String, BloomFilter<FileSet>>()
 
     override fun reorder(p: Params): List<TestResult> {
-        val unitMatrices = selectJobs(p).map(unitMatrix::get)
-        val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
+        val unitMatrices = p.priorJobs.map(unitMatrix::get)
+        val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
         val files: FileSet = TreeSet(p.changedFiles)
 
         val order: Map<TestResult, Int> = p.testResults.associateWith { tc ->
@@ -49,8 +49,6 @@ class Bloom(
     override fun acceptFailedRun(p: Params) {
         update(p.testResults, p.changedFiles.toSortedSet())
     }
-
-    private fun selectJobs(p: Params) = p.jobIds.subList(0, p.jobIndex)
 
     private fun test(tc: TestResult, files: FileSet): Boolean {
         val filter = filters[tc.name]

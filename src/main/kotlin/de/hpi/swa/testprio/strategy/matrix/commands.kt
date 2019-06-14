@@ -32,14 +32,12 @@ private class PrioritizeNaive : PrioritizeCommand(
 ) {
 
     val cacheDirectory by option("--cache").file(fileOkay = false).default(File("cache"))
-    val windowSize by option("--window").int().default(100)
     val alpha by option("--alpha").double().default(0.8)
 
     override fun strategy(repository: Repository) = NaiveMatrix(
         repository,
         Cache(cacheDirectory),
-        DevaluationReducer(alpha),
-        windowSize)
+        DevaluationReducer(alpha))
 }
 
 private class PrioritizeFileSimilarity : PrioritizeCommand(

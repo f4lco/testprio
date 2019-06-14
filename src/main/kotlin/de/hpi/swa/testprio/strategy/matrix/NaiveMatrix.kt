@@ -15,20 +15,18 @@ import de.hpi.swa.testprio.strategy.PrioritisationStrategy
  * failed given any of the changed files of this revision - have priority zero.
  *
  * @param reducer the reduction function to use when summing matrices
- * @param windowSize the maximum number of observations to consider; `-1` means all observations
  */
 class NaiveMatrix(
     repository: Repository,
     cache: Cache,
-    val reducer: Reducer,
-    val windowSize: Int = 100
+    val reducer: Reducer
 ) : PrioritisationStrategy {
 
     private val unitMatrix = UnitMatrix(repository, cache)
 
     override fun reorder(p: Params): List<TestResult> {
-        val unitMatrices = selectJobsByWindowSize(p).map(unitMatrix::get)
-        val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
+        val unitMatrices = p.priorJobs.map(unitMatrix::get)
+        val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
         val priorities = priority(sumMatrix, p.changedFiles)
         return p.testResults.sortedByDescending { priorities(it.name) }
     }
@@ -39,14 +37,5 @@ class NaiveMatrix(
                 key.testName == testName && key.fileName in changedFiles
             }.values.sum()
         }
-    }
-
-    private fun selectJobsByWindowSize(p: Params): Sequence<String> {
-        val end = p.jobIndex
-        val begin = when (windowSize) {
-            -1 -> 0
-            else -> Math.max(end - windowSize, 0)
-        }
-        return p.jobIds.subList(begin, end).asSequence()
     }
 }

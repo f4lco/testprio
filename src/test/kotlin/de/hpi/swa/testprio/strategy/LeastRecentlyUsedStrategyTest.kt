@@ -1,6 +1,7 @@
 package de.hpi.swa.testprio.strategy
 
 import hasTestOrder
+import jobWithId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -19,7 +20,7 @@ class LeastRecentlyUsedStrategyTest {
     @Test
     fun `first iteration leaves ordered unchanged`() {
         repository.load(Fixtures.repeatedFailure())
-        val result = strategy.reorder(params("1"))
+        val result = strategy.reorder(params(1))
 
         expectThat(result).hasTestOrder("T1", "T2")
     }
@@ -28,8 +29,8 @@ class LeastRecentlyUsedStrategyTest {
     fun `second iteration demotes the first test of the prior run`() {
         repository.load(Fixtures.repeatedFailure())
 
-        strategy.reorder(params("1"))
-        val result = strategy.reorder(params("2"))
+        strategy.reorder(params(1))
+        val result = strategy.reorder(params(2))
 
         expectThat(result).hasTestOrder("T2", "T1")
     }
@@ -38,8 +39,8 @@ class LeastRecentlyUsedStrategyTest {
     fun `added test cases are executed first`() {
         repository.load(addedTestCase())
 
-        strategy.reorder(params("1"))
-        val result = strategy.reorder(params("2"))
+        strategy.reorder(params(1))
+        val result = strategy.reorder(params(2))
 
         expectThat(result).hasTestOrder("addedTC", "tc1", "tc0")
     }
@@ -61,8 +62,8 @@ class LeastRecentlyUsedStrategyTest {
     fun `removed test cases are ignored`() {
         repository.load(removedTestCase())
 
-        strategy.reorder(params("1"))
-        val result = strategy.reorder(params("2"))
+        strategy.reorder(params(1))
+        val result = strategy.reorder(params(2))
 
         expectThat(result).hasTestOrder("tc1", "tc0")
     }
@@ -80,5 +81,5 @@ class LeastRecentlyUsedStrategyTest {
         }
     }
 
-    private fun params(jobId: String) = Params(jobId, repository.jobs(), repository)
+    private fun params(id: Int) = Params(jobWithId(id), repository.jobs(), repository)
 }

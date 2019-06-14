@@ -1,5 +1,6 @@
 package de.hpi.swa.testprio.strategy
 
+import jobWithId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -20,8 +21,8 @@ class OptimalTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = ["1", "2"])
-    fun failures(job: String) {
+    @ValueSource(ints = [1, 2])
+    fun failures(job: Int) {
         repository.load(Fixtures.repeatedFailure())
 
         val result = Optimal.byFailureCount().reorder(params(job))
@@ -37,7 +38,7 @@ class OptimalTest {
     fun failuresPerDurationUnchanged() {
         repository.load(failuresWithDuration())
 
-        val result = Optimal.byFailuresPerDuration().reorder(params("1"))
+        val result = Optimal.byFailuresPerDuration().reorder(params(1))
 
         expectThat(result) {
             hasSize(2)
@@ -50,7 +51,7 @@ class OptimalTest {
     fun failuresPerDurationChanged() {
         repository.load(failuresWithDuration())
 
-        val result = Optimal.byFailuresPerDuration().reorder(params("2"))
+        val result = Optimal.byFailuresPerDuration().reorder(params(2))
 
         expectThat(result) {
             hasSize(2)
@@ -71,5 +72,5 @@ class OptimalTest {
         }
     }
 
-    private fun params(job: String) = Params(job, repository.jobs(), repository)
+    private fun params(id: Int) = Params(jobWithId(id), repository.jobs(), repository)
 }

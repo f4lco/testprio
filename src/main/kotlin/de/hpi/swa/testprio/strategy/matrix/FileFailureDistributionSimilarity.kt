@@ -21,8 +21,8 @@ class FileFailureDistributionSimilarity(
     private val unitMatrix = UnitMatrix(repository, cache)
 
     override fun reorder(p: Params): List<TestResult> {
-        val unitMatrices = selectJobs(p).map(unitMatrix::get)
-        val sumMatrix = unitMatrices.fold(Matrix(p.jobId, emptyMap()), reducer)
+        val unitMatrices = p.priorJobs.map(unitMatrix::get)
+        val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
         val priorities = priorities(p.changedFiles, p.testResults.map { it.name }, sumMatrix)
         return p.testResults.sortedByDescending { priorities[it.name] }
     }
@@ -37,8 +37,6 @@ class FileFailureDistributionSimilarity(
                 .sum()
         }
     }
-
-    private fun selectJobs(p: Params) = p.jobIds.subList(0, p.jobIndex)
 
     private fun similarity(changedFiles: List<String>, m: Matrix): Map<String, Double> {
         val distances = m.fileNames().associateWith { distance(changedFiles, it, m) }

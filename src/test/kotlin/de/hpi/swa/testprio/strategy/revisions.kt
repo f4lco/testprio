@@ -2,7 +2,7 @@ package de.hpi.swa.testprio.strategy
 
 import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Job
-import java.time.Instant
+import jobWithId
 import java.util.concurrent.atomic.AtomicInteger
 
 data class Revision(
@@ -32,10 +32,7 @@ class RevisionBuilder {
         revisions.add(Revision(nextJob(), jobBuilder.changedFiles, jobBuilder.testResults))
     }
 
-    private fun nextJob(): Job {
-        val id = counter.incrementAndGet()
-        return Job(id, id, id, Instant.now(), Instant.now())
-    }
+    private fun nextJob() = jobWithId(counter.incrementAndGet())
 }
 
 class JobBuilder(

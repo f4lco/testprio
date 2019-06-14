@@ -1,6 +1,7 @@
 package de.hpi.swa.testprio.strategy
 
 import hasTestOrder
+import jobWithId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import strikt.api.expectThat
@@ -20,7 +21,7 @@ class PathTestCaseOverlapTest {
     fun `TC names with overlap to changed files are promoted`() {
         repository.load(fixture())
 
-        val result = strategy.reorder(Params("1", repository.jobs(), repository))
+        val result = strategy.reorder(params(1))
 
         expectThat(result).hasTestOrder("Car", "ca", "C", "z", "y", "x")
     }
@@ -32,4 +33,6 @@ class PathTestCaseOverlapTest {
             successful("z", "y", "x")
         }
     }
+
+    private fun params(id: Int) = Params(jobWithId(id), repository.jobs(), repository)
 }

@@ -4,6 +4,7 @@ import de.hpi.swa.testprio.strategy.Fixtures
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.TestRepository
 import hasTestOrder
+import jobWithId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -25,7 +26,7 @@ class NMFTest {
     fun nmf() {
         repository.load(Fixtures.similarTests())
 
-        val result = strategy.reorder(Params("4", repository.jobs(), repository))
+        val result = strategy.reorder(Params(jobWithId(4), repository.jobs(), repository))
 
         expectThat(result).hasTestOrder("C", "B", "A")
     }

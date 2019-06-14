@@ -24,7 +24,7 @@ fun TestResult.Companion.failed(testName: String) = TestResult(testName,
 
 object Fixtures {
 
-    fun matrixOne(jobId: String = "2") = Matrix(jobId,
+    fun matrixOne() = Matrix(
             mapOf(
                 Key("F1", "T1") to 2,
                 Key("F1", "T2") to 3,

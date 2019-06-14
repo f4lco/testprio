@@ -40,18 +40,18 @@ class StrategyRunnerTest {
         val t20 = t0 + Duration.ofSeconds(20)
 
         /* A, B: two consecutive builds */
-        val JOB_A1 = Job(buildNumber = 444, build = BUILD_A, job = 1, begin = t0, end = t10)
-        val JOB_A2 = Job(buildNumber = 444, build = BUILD_A, job = 2, begin = t0, end = t10)
+        val JOB_A1 = Job(buildNumber = 444, build = BUILD_A, jobNumber = 45, job = 1, begin = t0, end = t10)
+        val JOB_A2 = Job(buildNumber = 444, build = BUILD_A, jobNumber = 46, job = 2, begin = t0, end = t10)
 
-        val JOB_B1 = Job(buildNumber = 555, build = BUILD_B, job = 3, begin = t10, end = t20)
-        val JOB_B2 = Job(buildNumber = 555, build = BUILD_B, job = 4, begin = t10, end = t20)
+        val JOB_B1 = Job(buildNumber = 555, build = BUILD_B, jobNumber = 47, job = 3, begin = t10, end = t20)
+        val JOB_B2 = Job(buildNumber = 555, build = BUILD_B, jobNumber = 48, job = 4, begin = t10, end = t20)
 
         /* C, D: two interleaved builds */
-        val JOB_C1 = Job(buildNumber = 666, build = BUILD_C, job = 5, begin = t5, end = t10)
-        val JOB_C2 = Job(buildNumber = 666, build = BUILD_C, job = 6, begin = t0, end = t15)
+        val JOB_C1 = Job(buildNumber = 666, build = BUILD_C, jobNumber = 49, job = 5, begin = t5, end = t10)
+        val JOB_C2 = Job(buildNumber = 666, build = BUILD_C, jobNumber = 50, job = 6, begin = t0, end = t15)
 
-        val JOB_D1 = Job(buildNumber = 777, build = BUILD_D, job = 7, begin = t10, end = t20)
-        val JOB_D2 = Job(buildNumber = 777, build = BUILD_D, job = 8, begin = t15, end = t20)
+        val JOB_D1 = Job(buildNumber = 777, build = BUILD_D, jobNumber = 51, job = 7, begin = t10, end = t20)
+        val JOB_D2 = Job(buildNumber = 777, build = BUILD_D, jobNumber = 52, job = 8, begin = t15, end = t20)
     }
 
     interface CloseableStrategy : PrioritisationStrategy, AutoCloseable
@@ -72,7 +72,7 @@ class StrategyRunnerTest {
 
     @Test
     fun noJob() {
-        runner.run(PROJECT, strategy, output)
+        runner.run(PROJECT, strategy, null, output)
 
         verifyZeroInteractions(strategy)
     }
@@ -81,7 +81,7 @@ class StrategyRunnerTest {
     fun twoBuildsOneJobEach() {
         given { repository.redJobs(PROJECT) }.willReturn(listOf(JOB_A1, JOB_B1))
 
-        runner.run(PROJECT, strategy, output)
+        runner.run(PROJECT, strategy, null, output)
 
         inOrder(strategy) {
 
@@ -107,7 +107,7 @@ class StrategyRunnerTest {
     fun twoBuildsTwoJobsEach() {
         given { repository.redJobs(PROJECT) }.willReturn(listOf(JOB_A1, JOB_A2, JOB_B1, JOB_B2))
 
-        runner.run(PROJECT, strategy, output)
+        runner.run(PROJECT, strategy, null, output)
 
         inOrder(strategy) {
 
@@ -141,7 +141,7 @@ class StrategyRunnerTest {
     fun deferredLearningOfBuild() {
         given { repository.redJobs(PROJECT) }.willReturn(listOf(JOB_C1, JOB_C2, JOB_D1, JOB_D2))
 
-        runner.run(PROJECT, strategy, output)
+        runner.run(PROJECT, strategy, null, output)
 
         inOrder(strategy) {
 
@@ -171,20 +171,20 @@ class StrategyRunnerTest {
     fun strategyIsClosed() {
         val strategy = mock<CloseableStrategy>()
 
-        runner.run(PROJECT, strategy, output)
+        runner.run(PROJECT, strategy, null, output)
 
         verify(strategy).close()
     }
 
     fun Assertion.Builder<Params>.has(job: Int, priorJobs: List<Int>) {
         assert("has job ID", job) { actual ->
-            if (actual.jobId == job.toString()) pass()
-            else fail(actual = actual.jobId)
+            if (actual.job.job == job) pass()
+            else fail(actual = actual.job.job)
         }
 
         assert("has prior jobs (including current)") { actual ->
-            if (actual.jobIds == priorJobs.map { it.toString() }) pass()
-            else fail(actual = actual.jobIds)
+            if (actual.priorJobs.map { it.job } == priorJobs) pass()
+            else fail(actual = actual.priorJobs)
         }
     }
 }

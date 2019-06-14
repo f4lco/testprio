@@ -5,6 +5,7 @@ import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.TestRepository
 import de.hpi.swa.testprio.strategy.revisions
 import hasTestOrder
+import jobWithId
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -19,11 +20,9 @@ class RecentlyChangedTest {
 
     lateinit var strategy: RecentlyChanged
     lateinit var repository: TestRepository
-    @TempDir
-    lateinit var cache: File
 
     @BeforeEach
-    fun setUp() {
+    fun setUp(@TempDir cache: File) {
         repository = TestRepository()
         strategy = RecentlyChanged(repository, Cache(cache), CountingReducer, alpha = 0.8)
     }
@@ -31,14 +30,14 @@ class RecentlyChangedTest {
     @Test
     fun testPriorities() {
         repository.load(changeFileOneThenTwo())
-        strategy.acceptFailedRun(Params("1", repository.jobs(), repository))
-        strategy.acceptFailedRun(Params("2", repository.jobs(), repository))
+        strategy.acceptFailedRun(params(1))
+        strategy.acceptFailedRun(params(2))
 
-        val priorities = strategy.priorities(3, Fixtures.matrixOne())
+        val priorities = strategy.priorities(repository.jobs(), Fixtures.matrixOne())
 
         expectThat(priorities) {
-            get("F1").isNotNull().isEqualTo(0.04, 0.01)
-            get("F2").isNotNull().isEqualTo(0.16, 0.01)
+            get("F1").isNotNull().isEqualTo(0.15, 0.01)
+            get("F2").isEqualTo(0.8)
         }
     }
 
@@ -52,10 +51,12 @@ class RecentlyChangedTest {
     @DisplayName("Promote test due to recently changed files")
     fun recentlyChanged() {
         repository.load(Fixtures.repeatedFailure())
-        strategy.acceptFailedRun(Params("1", repository.jobs(), repository))
+        strategy.acceptFailedRun(params(1))
 
-        val result = strategy.reorder(Params("2", repository.jobs(), repository))
+        val result = strategy.reorder(params(2))
 
         expectThat(result).hasTestOrder("T2", "T1")
     }
+
+    private fun params(id: Int) = Params(jobWithId(id), repository.jobs(), repository)
 }

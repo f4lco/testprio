@@ -9,9 +9,9 @@ import java.math.BigDecimal
 
 object TestResults {
 
-    fun ofJob(context: DSLContext, jobId: String): List<TestResult> =
+    fun ofJob(context: DSLContext, job: Job): List<TestResult> =
             context.selectFrom<Record>("tr_test_result")
-                    .where(field(name("tr_job_id")).eq(jobId.toInt()))
+                    .where(field(name("tr_job_id")).eq(job.job))
                     .orderBy(field(name("index")))
                     .fetch {
                         TestResult(name = it["name"] as String,
