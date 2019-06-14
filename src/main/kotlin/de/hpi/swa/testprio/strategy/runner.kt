@@ -7,6 +7,7 @@ import de.hpi.swa.testprio.probe.Repository
 import me.tongfei.progressbar.ProgressBar
 import mu.KotlinLogging
 import java.io.File
+import java.util.PriorityQueue
 
 class Params(
     val jobId: String,
@@ -18,6 +19,11 @@ class Params(
 
     val testResults: List<TestResult> by lazy { repository.testResults(jobId) }
 
+    // FIXME invent "job serial number" for indexing to bitsets
+    // Look at runner tests: multiple jobs may conclude they are at the same position
+    // Rename jobIds to priorJobs?
+    // Perhaps even jobIndex >= len(priorJobs) ???
+    // Consider "current" and "deferred" jobs / learning
     val jobIndex by lazy { jobIds.indexOf(jobId) }
 }
 
@@ -55,23 +61,49 @@ class StrategyRunner(val repository: Repository) {
     }
 
     private fun processBuilds(builds: Map<Int, List<Job>>, strategy: PrioritisationStrategy) = sequence {
+        val pending = PriorityQueue<PendingBuild>(compareBy { it.end })
         val priorJobs = mutableListOf<Job>()
+
         for ((build, jobGroup) in builds) {
+
+            // Learn all completed builds
+            val jobGroupBegin = jobGroup.map { it.begin }.min()
+            while (pending.isNotEmpty() && pending.peek().end <= jobGroupBegin) {
+                val priorBuild = pending.poll()
+                LOG.debug { "Learning results of build ${priorBuild.id}" }
+                for (job in priorBuild.jobs) {
+                    advanceState(job, priorBuild.priorJobs, strategy)
+                }
+                priorJobs += priorBuild.jobs
+            }
+
+            // Treat current build
+            val newBuild = PendingBuild(jobGroup, priorJobs.toList())
             LOG.debug { "Processing build $build (${jobGroup.size} jobs)" }
             yieldAll(processBuild(jobGroup, priorJobs, strategy))
-            priorJobs += jobGroup
+            pending += newBuild
         }
+
+        // Drain pending jobs
+        while (pending.isNotEmpty()) {
+            val priorBuild = pending.poll()
+            LOG.debug { "Learning results of build ${priorBuild.id}" }
+            for (job in priorBuild.jobs) {
+                advanceState(job, priorBuild.priorJobs, strategy)
+            }
+            priorJobs += priorBuild.jobs
+        }
+    }
+
+    data class PendingBuild(val jobs: List<Job>, val priorJobs: List<Job>) {
+        val id = jobs.first().build
+        val end = jobs.map { it.end }.max()!!
     }
 
     private fun processBuild(jobs: List<Job>, priorJobs: List<Job>, strategy: PrioritisationStrategy) = sequence {
         for (job in jobs) {
             LOG.debug { "Reorder job $job" }
             yield(job to reorderJob(job, priorJobs, strategy))
-        }
-
-        for (job in jobs) {
-            LOG.debug { "Apply state for job $job" }
-            advanceState(job, priorJobs, strategy)
         }
     }
 
