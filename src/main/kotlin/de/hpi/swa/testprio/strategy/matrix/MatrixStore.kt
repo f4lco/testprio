@@ -15,6 +15,6 @@ object MatrixStore {
 
     fun read(file: File) = if (file.exists()) {
         logger.debug { "Loading $file" }
-        Json.parse(Matrix.serializer(), file.readText())
+        Json.nonstrict.parse(Matrix.serializer(), file.readText())
     } else null
 }
