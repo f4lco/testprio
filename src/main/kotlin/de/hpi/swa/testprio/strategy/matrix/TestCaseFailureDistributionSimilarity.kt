@@ -34,8 +34,7 @@ class TestCaseFailureDistributionSimilarity(
     }
 
     private fun collectRelevantTests(p: Params, m: Matrix): Set<String> {
-        return m.matrix.keys
-                .filter { it.fileName in p.changedFiles }
+        return m.keys.filter { it.fileName in p.changedFiles }
                 .map { it.testName }
                 .toSet()
     }
@@ -44,7 +43,7 @@ class TestCaseFailureDistributionSimilarity(
         val testToSimilarity = similarities(m, relevantTests)
 
         return m.testNames().associateWith { tc ->
-            m.matrix.filterKeys { it.testName == tc }.values.sum() * (testToSimilarity[tc] ?: 0.0)
+            m.filterKeys { it.testName == tc }.values.sum() * (testToSimilarity[tc] ?: 0.0)
         }
     }
 

@@ -17,7 +17,7 @@ class MatrixStoreTest {
 
         expectThat(read) {
             isNotNull().and {
-                get { matrix }.hasSize(80)
+                hasSize(80)
             }
         }
     }

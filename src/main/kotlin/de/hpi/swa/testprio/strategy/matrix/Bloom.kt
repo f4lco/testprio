@@ -37,8 +37,7 @@ class Bloom(
 
         val order: Map<TestResult, Int> = p.testResults.associateWith { tc ->
             if (test(tc, files)) {
-                sumMatrix.matrix
-                        .filterKeys { it.testName == tc.name }
+                sumMatrix.filterKeys { it.testName == tc.name }
                         .values.sum()
             } else 0
         }

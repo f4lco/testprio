@@ -27,7 +27,7 @@ fun Matrix.print() {
 }
 
 fun Matrix.tableString(n: Int = 4): String = StringBuilder(128).apply {
-    val tc = matrix.keys.map { it.testName }.toSortedSet()
+    val tc = keys.map { it.testName }.toSortedSet()
 
     append(" ".repeat(n))
     for (name in tc) {
@@ -35,11 +35,11 @@ fun Matrix.tableString(n: Int = 4): String = StringBuilder(128).apply {
     }
     appendln()
 
-    val files = matrix.keys.map { it.fileName }.toSortedSet()
+    val files = keys.map { it.fileName }.toSortedSet()
     for (name in files) {
         append(name.padEnd(n))
         for (t in tc) {
-            val value = matrix[Key(name, t)] ?: 0
+            val value = this@tableString[Key(name, t)] ?: 0
             append(value.toString().padEnd(n))
         }
         appendln()

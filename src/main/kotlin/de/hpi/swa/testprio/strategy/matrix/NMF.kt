@@ -32,12 +32,12 @@ class NMF(
         val unitMatrices = p.priorJobs.map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
 
-        if (sumMatrix.matrix.isEmpty()) {
+        if (sumMatrix.isEmpty()) {
             return p.testResults
         }
 
-        val files = sumMatrix.matrix.keys.map { it.fileName }.toSortedSet()
-        val tests = sumMatrix.matrix.keys.map { it.testName }.toSortedSet()
+        val files = sumMatrix.keys.map { it.fileName }.toSortedSet()
+        val tests = sumMatrix.keys.map { it.testName }.toSortedSet()
 
         val matrixX = sumMatrix.toJblas()
         val matrixW = DoubleMatrix(files.size, components)
@@ -64,10 +64,10 @@ class NMF(
 }
 
 private fun Matrix.toJblas(): DoubleMatrix {
-    val files = matrix.keys.map { it.fileName }.toSortedSet()
-    val tests = matrix.keys.map { it.testName }.toSortedSet()
+    val files = keys.map { it.fileName }.toSortedSet()
+    val tests = keys.map { it.testName }.toSortedSet()
     val m = DoubleMatrix(files.size, tests.size)
-    for (entry in matrix) {
+    for (entry in this) {
         val rowIndex = files.indexOf(entry.key.fileName)
         val columnIndex = tests.indexOf(entry.key.testName)
         m.put(rowIndex, columnIndex, entry.value.toDouble())
@@ -78,15 +78,15 @@ private fun Matrix.toJblas(): DoubleMatrix {
 fun main(args: Array<String>) {
     val path = args[0]
     val m: Matrix = MatrixStore.read(File(path))!!
-    val files = m.matrix.keys.map { it.fileName }.toSortedSet()
-    val testCases = m.matrix.keys.map { it.testName }.toSortedSet()
+    val files = m.keys.map { it.fileName }.toSortedSet()
+    val testCases = m.keys.map { it.testName }.toSortedSet()
     println("Loaded $path")
     println("${files.size} files and ${testCases.size} test cases")
 
     val rows = mutableListOf<DoubleArray>()
     for (fileName in files) {
         val row = testCases.map {
-            testName -> m.matrix[Key(fileName, testName)]?.toDouble() ?: 0.0
+            testName -> m[Key(fileName, testName)]?.toDouble() ?: 0.0
         }.toDoubleArray()
 
         rows.add(row)
@@ -106,14 +106,14 @@ fun main(args: Array<String>) {
 
     for ((index, testName) in testCases.withIndex()) {
         print("$testName ${matrixH[index]} ")
-        val relevant = m.matrix.filterKeys { it.testName == testName }.keys.map { it.fileName }.toSortedSet()
+        val relevant = m.filterKeys { it.testName == testName }.keys.map { it.fileName }.toSortedSet()
         println(relevant)
     }
     println()
 
     for ((index, fileName) in files.withIndex()) {
         print("$fileName ${matrixW[index]}")
-        val relevant = m.matrix.keys.filter { it.fileName == fileName }.map { it.testName }.toSortedSet()
+        val relevant = m.keys.filter { it.fileName == fileName }.map { it.testName }.toSortedSet()
         println(relevant)
     }
 

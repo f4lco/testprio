@@ -33,7 +33,7 @@ class NaiveMatrix(
 
     internal fun priority(m: Matrix, changedFiles: List<String>): (String) -> Int {
         return { testName ->
-            m.matrix.filterKeys { key ->
+            m.filterKeys { key ->
                 key.testName == testName && key.fileName in changedFiles
             }.values.sum()
         }

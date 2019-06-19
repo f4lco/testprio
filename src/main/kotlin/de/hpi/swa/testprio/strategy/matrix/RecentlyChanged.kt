@@ -29,8 +29,7 @@ class RecentlyChanged(
         val filePriorities = priorities(p.priorJobs, sumMatrix)
 
         val testPriorities = p.testResults.associateWith { tc ->
-            sumMatrix.matrix
-                    .filterKeys { it.testName == tc.name }
+            sumMatrix.filterKeys { it.testName == tc.name }
                     .map { filePriorities.getOrDefault(it.key.fileName, 0.0) * it.value.toDouble() }
                     .sum()
         }

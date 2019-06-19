@@ -31,8 +31,7 @@ class FileFailureDistributionSimilarity(
         val fileToSimilarity = similarity(changedFiles, sumMatrix)
 
         return tests.associateWith { tc ->
-            sumMatrix.matrix
-                .filterKeys { it.testName == tc }
+            sumMatrix.filterKeys { it.testName == tc }
                 .map { entry -> (fileToSimilarity[entry.key.fileName] ?: 0.0) * entry.value.toDouble() }
                 .sum()
         }

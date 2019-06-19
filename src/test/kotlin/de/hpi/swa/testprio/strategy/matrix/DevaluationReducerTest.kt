@@ -23,7 +23,7 @@ class DevaluationReducerTest {
 
         val reduced = reducer(m, n)
 
-        expectThat(reduced.matrix).isEqualTo(m.matrix + n.matrix)
+        expectThat(reduced).isEqualTo(Matrix(m + n))
     }
 
     @Test
@@ -33,7 +33,7 @@ class DevaluationReducerTest {
 
         val reduced = reducer(m, n)
 
-        expectThat(reduced.matrix).isEqualTo(mapOf(Key("F1", "T1") to 4))
+        expectThat(reduced).isEqualTo(mapOf(Key("F1", "T1") to 4).toMatrix())
     }
 
     @Test
@@ -47,10 +47,10 @@ class DevaluationReducerTest {
 
         val reduced = reducer(m, n)
 
-        expectThat(reduced.matrix).isEqualTo(
+        expectThat(reduced).isEqualTo(
                 mapOf(
                         Key("F1", "T1") to 4,
-                        Key("F1", "T2") to 5)
+                        Key("F1", "T2") to 5).toMatrix()
         )
     }
 
