@@ -4,6 +4,8 @@ import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * Prioritize TC of files whose failure distribution is similar to the files of the changeset.
@@ -23,39 +25,36 @@ class FileFailureDistributionSimilarity(
     override fun reorder(p: Params): List<TestResult> {
         val unitMatrices = p.priorJobs.map(unitMatrix::get)
         val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
-        val priorities = priorities(p.changedFiles, p.testResults.map { it.name }, sumMatrix)
+        val priorities = priorities(p.changedFiles, sumMatrix)
         return p.testResults.sortedByDescending { priorities[it.name] }
     }
 
-    internal fun priorities(changedFiles: List<String>, tests: List<String>, sumMatrix: Matrix): Map<String, Double> {
-        val fileToSimilarity = similarity(changedFiles, sumMatrix)
+    internal fun priorities(changedFiles: List<String>, matrix: Matrix): Map<String, Double> {
+        val fileToSimilarity = similarity(changedFiles, matrix)
 
-        return tests.associateWith { tc ->
-            sumMatrix.filterKeys { it.testName == tc }
+        return matrix.testNames().associateWith { tc ->
+            matrix.filterKeys { it.testName == tc }
                 .map { entry -> (fileToSimilarity[entry.key.fileName] ?: 0.0) * entry.value }
                 .sum()
         }
     }
 
-    private fun similarity(changedFiles: List<String>, m: Matrix): Map<String, Double> {
-        val distances = m.fileNames().associateWith { distance(changedFiles, it, m) }
-        val sum = distances.values.sum()
-        return distances.mapValues { 1 - it.value / sum }
-    }
+    private fun similarity(changedFiles: List<String>, m: Matrix): Map<String, Double> = m.fileNames().associateWith { file ->
+            changedFiles.parallelStream().mapToDouble { changedFile ->
 
-    private fun distance(changedFiles: List<String>, f: String, m: Matrix): Double {
-        return changedFiles.map { distance(f, it, m) }.min() ?: 1.0
-    }
+                val a = m.testDistribution(changedFile)
+                val b = m.testDistribution(file)
+                var dot = 0.0
+                var normA = 0.0
+                var normB = 0.0
 
-    private fun distance(f1: String, f2: String, m: Matrix): Double {
-        return norm(f1, m).zip(norm(f2, m)).map { (a, b) -> squaredError(a, b) }.sum()
-    }
+                for ((va, vb) in a.zip(b)) {
+                    dot += va * vb
+                    normA += va.pow(2.0)
+                    normB += vb.pow(2.0)
+                }
 
-    private fun norm(f: String, m: Matrix): List<Double> {
-        val distribution = m.testDistribution(f)
-        val sum = distribution.sum()
-        return distribution.map { it / sum }
-    }
-
-    private fun squaredError(a: Double, b: Double) = Math.pow(a - b, 2.0)
+                dot / (sqrt(normA) * sqrt(normB))
+            }.max().orElse(0.0)
+        }
 }

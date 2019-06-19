@@ -4,6 +4,8 @@ import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
 import de.hpi.swa.testprio.strategy.PrioritisationStrategy
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * Prioritize test cases whose failure distribution is similar.
@@ -47,28 +49,22 @@ class TestCaseFailureDistributionSimilarity(
         }
     }
 
-    private fun similarities(m: Matrix, relevantTests: Set<String>): Map<String, Double> {
-        val testToDistance = m.testNames().associateWith { testName ->
-            distance(m, relevantTests, testName)
-        }
+    private fun similarities(m: Matrix, relevantTests: Set<String>): Map<String, Double> = m.testNames().associateWith { tc ->
+        relevantTests.parallelStream().mapToDouble { relevantTC ->
 
-        val distances = testToDistance.values.sum()
-        return testToDistance.mapValues { 1 - it.value / distances }
+            val a = m.fileDistribution(relevantTC)
+            val b = m.fileDistribution(tc)
+            var dot = 0.0
+            var normA = 0.0
+            var normB = 0.0
+
+            for ((va, vb) in a.zip(b)) {
+                dot += va * vb
+                normA += va.pow(2.0)
+                normB += vb.pow(2.0)
+            }
+
+            dot / (sqrt(normA) * sqrt(normB))
+        }.max().orElse(0.0)
     }
-
-    private fun distance(m: Matrix, relevantTests: Set<String>, tc: String): Double {
-        return relevantTests.map { distance(m, it, tc) }.min() ?: 0.0
-    }
-
-    private fun distance(m: Matrix, t1: String, t2: String): Double {
-        return norm(t1, m).zip(norm(t2, m)).map { (a, b) -> squaredError(a, b) }.sum()
-    }
-
-    private fun norm(t: String, m: Matrix): List<Double> {
-        val distribution = m.fileDistribution(t)
-        val sum = distribution.sum()
-        return distribution.map { it / sum }
-    }
-
-    private fun squaredError(a: Double, b: Double) = Math.pow(a - b, 2.0)
 }

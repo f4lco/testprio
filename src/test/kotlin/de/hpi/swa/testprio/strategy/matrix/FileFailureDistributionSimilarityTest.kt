@@ -11,6 +11,7 @@ import org.junit.jupiter.api.io.TempDir
 import strikt.api.expectThat
 import strikt.assertions.get
 import strikt.assertions.isEqualTo
+import strikt.assertions.isNotNull
 import java.io.File
 
 class FileFailureDistributionSimilarityTest {
@@ -26,12 +27,12 @@ class FileFailureDistributionSimilarityTest {
 
     @Test
     fun testPriorities() {
-        val priorities = strategy.priorities(listOf("F1"), listOf("T1", "T2", "T3"), Fixtures.matrixOne())
+        val priorities = strategy.priorities(listOf("F1"), Fixtures.matrixOne())
 
         expectThat(priorities) {
-            get("T1").isEqualTo(2.0)
-            get("T2").isEqualTo(3.0)
-            get("T3").isEqualTo(5.0)
+            get("T1").isNotNull().isEqualTo(12.15, 0.01)
+            get("T2").isNotNull().isEqualTo(8.07, 0.01)
+            get("T3").isNotNull().isEqualTo(5.0, 0.01)
         }
     }
 

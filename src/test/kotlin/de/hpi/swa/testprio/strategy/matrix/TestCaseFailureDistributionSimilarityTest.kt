@@ -26,13 +26,13 @@ class TestCaseFailureDistributionSimilarityTest {
     }
 
     @Test
-    fun testSimilarities() {
-        val similarities = strategy.priorities(Fixtures.matrixOne(), setOf("T1"))
+    fun testPriorities() {
+        val priorities = strategy.priorities(Fixtures.matrixOne(), setOf("T1"))
 
-        expectThat(similarities) {
+        expectThat(priorities) {
             get("T1").isEqualTo(22.0)
-            get("T2").isNotNull().isEqualTo(12.7, 0.01)
-            get("T3").isNotNull().isEqualTo(0.11, 0.01)
+            get("T2").isNotNull().isEqualTo(12.76, 0.01)
+            get("T3").isNotNull().isEqualTo(0.49, 0.01)
         }
     }
 
