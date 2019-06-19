@@ -41,10 +41,10 @@ class StrategyRunner(val repository: Repository) {
         windowSize: Int?,
         output: File
     ) {
+        val jobs = repository.redJobs(projectName)
+        val builds = jobs.groupBy { it.build }
 
-        val builds = repository.redJobs(projectName).groupBy { it.build }
-
-        ProgressBar("Builds", builds.size.toLong()).use { progress ->
+        ProgressBar("Jobs", jobs.size.toLong()).use { progress ->
             val results = processBuilds(builds, strategy, windowSize).onEach { progress.step() }
             PrioritizationResultOutput.write(results, output)
         }
