@@ -6,7 +6,6 @@ deeplearning4j deeplearning4j
 DSpace DSpace
 eclipse jetty.project
 facebook buck
-google guava
 jcabi jcabi-github
 jOOQ jOOQ
 jsprit jsprit
@@ -14,7 +13,6 @@ l0rdn1kk0n wicket-bootstrap
 neuland jade4j
 SonarSource sonarqube
 square okhttp
-square retrofit
 dynjs dynjs
 thinkaurelius titan
 doanduyhai Achilles
