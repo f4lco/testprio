@@ -116,7 +116,7 @@ class StrategyRunner(val repository: Repository) {
     }
 
     private fun newParams(job: Job, priorJobs: List<Job>): Params {
-        return Params(job, priorJobs + job, repository)
+        return Params(job, priorJobs.toList(), repository)
     }
 
     private fun ensureIndexed(tr: List<TestResult>) = tr.mapIndexed { index, t -> t.copy(index = index) }

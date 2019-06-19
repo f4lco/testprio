@@ -87,18 +87,18 @@ class StrategyRunnerTest {
 
             argumentCaptor<Params> {
                 verify(strategy).reorder(capture())
-                expectThat(lastValue).has(job = 1, priorJobs = listOf(1))
+                expectThat(lastValue).has(job = 1, priorJobs = emptyList())
 
                 verify(strategy).acceptFailedRun(capture())
-                expectThat(lastValue).has(job = 1, priorJobs = listOf(1))
+                expectThat(lastValue).has(job = 1, priorJobs = emptyList())
             }
 
             argumentCaptor<Params> {
                 verify(strategy).reorder(capture())
-                expectThat(lastValue).has(job = 3, priorJobs = listOf(1, 3))
+                expectThat(lastValue).has(job = 3, priorJobs = listOf(1))
 
                 verify(strategy).acceptFailedRun(capture())
-                expectThat(lastValue).has(job = 3, priorJobs = listOf(1, 3))
+                expectThat(lastValue).has(job = 3, priorJobs = listOf(1))
             }
         }
     }
@@ -113,26 +113,30 @@ class StrategyRunnerTest {
 
             argumentCaptor<Params> {
                 verify(strategy, times(2)).reorder(capture())
-                expectThat(firstValue).has(job = 1, priorJobs = listOf(1))
-                expectThat(secondValue).has(job = 2, priorJobs = listOf(2))
+                expectThat(allValues) {
+                    get(0).has(job = 1, priorJobs = emptyList())
+                    get(1).has(job = 2, priorJobs = emptyList())
+                }
             }
 
             argumentCaptor<Params> {
                 verify(strategy, times(2)).acceptFailedRun(capture())
-                expectThat(firstValue).has(job = 1, priorJobs = listOf(1))
-                expectThat(secondValue).has(job = 2, priorJobs = listOf(2))
+                expectThat(allValues) {
+                    get(0).has(job = 1, priorJobs = emptyList())
+                    get(1).has(job = 2, priorJobs = emptyList())
+                }
             }
 
             argumentCaptor<Params> {
                 verify(strategy, times(2)).reorder(capture())
-                expectThat(firstValue).has(job = 3, priorJobs = listOf(1, 2, 3))
-                expectThat(secondValue).has(job = 4, priorJobs = listOf(1, 2, 4))
+                expectThat(firstValue).has(job = 3, priorJobs = listOf(1, 2))
+                expectThat(secondValue).has(job = 4, priorJobs = listOf(1, 2))
             }
 
             argumentCaptor<Params> {
                 verify(strategy, times(2)).acceptFailedRun(capture())
-                expectThat(firstValue).has(job = 3, priorJobs = listOf(1, 2, 3))
-                expectThat(secondValue).has(job = 4, priorJobs = listOf(1, 2, 4))
+                expectThat(firstValue).has(job = 3, priorJobs = listOf(1, 2))
+                expectThat(secondValue).has(job = 4, priorJobs = listOf(1, 2))
             }
         }
     }
@@ -148,20 +152,20 @@ class StrategyRunnerTest {
             argumentCaptor<Params> {
                 verify(strategy, times(4)).reorder(capture())
                 expectThat(allValues) {
-                    get(0).has(job = 5, priorJobs = listOf(5))
-                    get(1).has(job = 6, priorJobs = listOf(6))
-                    get(2).has(job = 7, priorJobs = listOf(7))
-                    get(3).has(job = 8, priorJobs = listOf(8))
+                    get(0).has(job = 5, priorJobs = emptyList())
+                    get(1).has(job = 6, priorJobs = emptyList())
+                    get(2).has(job = 7, priorJobs = emptyList())
+                    get(3).has(job = 8, priorJobs = emptyList())
                 }
             }
 
             argumentCaptor<Params> {
                 verify(strategy, times(4)).acceptFailedRun(capture())
                 expectThat(allValues) {
-                    get(0).has(job = 5, priorJobs = listOf(5))
-                    get(1).has(job = 6, priorJobs = listOf(6))
-                    get(2).has(job = 7, priorJobs = listOf(7))
-                    get(3).has(job = 8, priorJobs = listOf(8))
+                    get(0).has(job = 5, priorJobs = emptyList())
+                    get(1).has(job = 6, priorJobs = emptyList())
+                    get(2).has(job = 7, priorJobs = emptyList())
+                    get(3).has(job = 8, priorJobs = emptyList())
                 }
             }
         }
@@ -182,7 +186,7 @@ class StrategyRunnerTest {
             else fail(actual = actual.job.job)
         }
 
-        assert("has prior jobs (including current)") { actual ->
+        assert("has prior jobs") { actual ->
             if (actual.priorJobs.map { it.job } == priorJobs) pass()
             else fail(actual = actual.priorJobs)
         }
