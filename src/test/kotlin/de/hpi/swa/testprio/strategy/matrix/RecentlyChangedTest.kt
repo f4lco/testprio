@@ -30,8 +30,8 @@ class RecentlyChangedTest {
     @Test
     fun testPriorities() {
         repository.load(changeFileOneThenTwo())
-        strategy.acceptFailedRun(params(1))
-        strategy.acceptFailedRun(params(2))
+        strategy.reorder(params(1))
+        strategy.reorder(params(2))
 
         val priorities = strategy.priorities(repository.jobs(), Fixtures.matrixOne())
 
@@ -51,7 +51,7 @@ class RecentlyChangedTest {
     @DisplayName("Promote test due to recently changed files")
     fun recentlyChanged() {
         repository.load(Fixtures.repeatedFailure())
-        strategy.acceptFailedRun(params(1))
+        strategy.reorder(params(1))
 
         val result = strategy.reorder(params(2))
 

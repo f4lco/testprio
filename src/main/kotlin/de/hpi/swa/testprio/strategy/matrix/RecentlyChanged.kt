@@ -34,11 +34,9 @@ class RecentlyChanged(
                     .sum()
         }
 
-        return p.testResults.sortedByDescending { testPriorities[it] }
-    }
-
-    override fun acceptFailedRun(p: Params) {
         p.changedFiles.forEach { histories.computeIfAbsent(it) { BitSet() }.set(p.job.jobNumber) }
+
+        return p.testResults.sortedByDescending { testPriorities[it] }
     }
 
     internal fun priorities(priorJobs: List<Job>, m: Matrix): Map<String, Double> {
