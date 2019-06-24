@@ -31,7 +31,7 @@ class NaiveMatrix(
         return p.testResults.sortedByDescending { priorities(it.name) }
     }
 
-    internal fun priority(m: Matrix, changedFiles: List<String>): (String) -> Int {
+    internal fun priority(m: Matrix, changedFiles: List<String>): (String) -> Double {
         return { testName ->
             m.filterKeys { key ->
                 key.testName == testName && key.fileName in changedFiles

@@ -26,12 +26,12 @@ object Fixtures {
 
     fun matrixOne() = Matrix(
             mapOf(
-                Key("F1", "T1") to 2,
-                Key("F1", "T2") to 3,
-                Key("F1", "T3") to 5,
+                Key("F1", "T1") to 2.0,
+                Key("F1", "T2") to 3.0,
+                Key("F1", "T3") to 5.0,
 
-                Key("F2", "T1") to 20,
-                Key("F2", "T2") to 10))
+                Key("F2", "T1") to 20.0,
+                Key("F2", "T2") to 10.0))
 
     fun repeatedFailure() = revisions {
 

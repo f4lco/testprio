@@ -35,11 +35,11 @@ class Bloom(
         val sumMatrix = unitMatrices.fold(Matrix.empty(), reducer)
         val files: FileSet = TreeSet(p.changedFiles)
 
-        val order: Map<TestResult, Int> = p.testResults.associateWith { tc ->
+        val order = p.testResults.associateWith { tc ->
             if (test(tc, files)) {
                 sumMatrix.filterKeys { it.testName == tc.name }
                         .values.sum()
-            } else 0
+            } else 0.0
         }
 
         return p.testResults.sortedByDescending { order[it] }

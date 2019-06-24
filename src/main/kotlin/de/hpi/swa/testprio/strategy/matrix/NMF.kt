@@ -70,7 +70,7 @@ private fun Matrix.toJblas(): DoubleMatrix {
     for (entry in this) {
         val rowIndex = files.indexOf(entry.key.fileName)
         val columnIndex = tests.indexOf(entry.key.testName)
-        m.put(rowIndex, columnIndex, entry.value.toDouble())
+        m.put(rowIndex, columnIndex, entry.value)
     }
     return m
 }
@@ -86,7 +86,7 @@ fun main(args: Array<String>) {
     val rows = mutableListOf<DoubleArray>()
     for (fileName in files) {
         val row = testCases.map {
-            testName -> m[Key(fileName, testName)]?.toDouble() ?: 0.0
+            testName -> m[Key(fileName, testName)] ?: 0.0
         }.toDoubleArray()
 
         rows.add(row)

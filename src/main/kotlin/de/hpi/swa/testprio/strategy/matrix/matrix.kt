@@ -3,7 +3,7 @@ package de.hpi.swa.testprio.strategy.matrix
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Matrix(private val matrix: Map<Key, Int>) : Map<Key, Int> by matrix {
+data class Matrix(private val matrix: Map<Key, Double>) : Map<Key, Double> by matrix {
     companion object
 }
 
@@ -15,7 +15,7 @@ fun Matrix.fileDistribution(tc: String): DoubleArray {
     val files = fileNames()
     val distribution = DoubleArray(files.size)
     for ((index, file) in files.withIndex()) {
-        distribution[index] = this[Key(file, tc)]?.toDouble() ?: 0.0
+        distribution[index] = this[Key(file, tc)] ?: 0.0
     }
     return distribution
 }
@@ -26,7 +26,7 @@ fun Matrix.testDistribution(f: String): DoubleArray {
     val tests = testNames()
     val distribution = DoubleArray(tests.size)
     for ((index, test) in tests.withIndex()) {
-        distribution[index] = this[Key(f, test)]?.toDouble() ?: 0.0
+        distribution[index] = this[Key(f, test)] ?: 0.0
     }
     return distribution
 }

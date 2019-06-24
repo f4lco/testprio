@@ -53,7 +53,7 @@ class DevaluationReducerTest {
         )
     }
 
-    private fun Map<Key, Int>.toMatrix() = Matrix(this)
+    private fun Map<Key, Int>.toMatrix() = Matrix(this.mapValues { it.value.toDouble() })
 
     @Test
     fun testExample() {
@@ -73,7 +73,7 @@ class DevaluationReducerTest {
             Key("F1", "T2") to 6
         )
 
-        val reduced = DevaluationReducer(alpha = 0.8)(Matrix(m), Matrix(n))
+        val reduced = DevaluationReducer(alpha = 0.8)(m.toMatrix(), n.toMatrix())
 
         reduced.print()
     }

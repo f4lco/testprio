@@ -32,7 +32,7 @@ class FileFailureDistributionSimilarity(
 
         return tests.associateWith { tc ->
             sumMatrix.filterKeys { it.testName == tc }
-                .map { entry -> (fileToSimilarity[entry.key.fileName] ?: 0.0) * entry.value.toDouble() }
+                .map { entry -> (fileToSimilarity[entry.key.fileName] ?: 0.0) * entry.value }
                 .sum()
         }
     }

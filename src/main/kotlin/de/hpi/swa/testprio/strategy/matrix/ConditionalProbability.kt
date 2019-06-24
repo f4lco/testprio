@@ -30,7 +30,7 @@ class ConditionalProbability(
     private fun fileCounts(m: Matrix): Map<String, Pair<Double, Double>> {
         val counts = mutableMapOf<String, Double>()
         for (entry in m) {
-            counts.merge(entry.key.fileName, entry.value.toDouble(), Double::plus)
+            counts.merge(entry.key.fileName, entry.value, Double::plus)
         }
 
         val sum = counts.values.sum()
@@ -48,7 +48,7 @@ class ConditionalProbability(
 
         return changedFiles.map { file ->
             val (fileCount, fileProbability) = fileCounts[file] ?: Pair(0.0, 0.0)
-            val count = m[Key(file, tc)] ?: 0
+            val count = m[Key(file, tc)] ?: 0.0
             fileProbability * (count / fileCount)
         }.sum()
     }

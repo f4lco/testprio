@@ -20,10 +20,10 @@ class UnitMatrix(
     }
 
     private fun createUnitMatrix(changedFiles: List<String>, testResults: List<TestResult>): Matrix {
-        val matrix = mutableMapOf<Key, Int>()
+        val matrix = mutableMapOf<Key, Double>()
         for (test in testResults.filter { it.red > 0 }) {
             for (file in changedFiles) {
-                matrix.merge(Key(file, test.name), test.red, Int::plus)
+                matrix.merge(Key(file, test.name), test.red.toDouble(), Double::plus)
             }
         }
         return if (matrix.isEmpty()) Matrix.empty() else Matrix(matrix)

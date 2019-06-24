@@ -27,9 +27,9 @@ class NaiveMatrixTest {
     fun testMatrixOne() {
         val priority = strategy.priority(Fixtures.matrixOne(), listOf("F1", "F2"))
 
-        expectThat(priority("T1")).isEqualTo(22)
-        expectThat(priority("T2")).isEqualTo(13)
-        expectThat(priority("T3")).isEqualTo(5)
+        expectThat(priority("T1")).isEqualTo(22.0)
+        expectThat(priority("T2")).isEqualTo(13.0)
+        expectThat(priority("T3")).isEqualTo(5.0)
     }
 
     @Test

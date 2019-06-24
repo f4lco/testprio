@@ -32,7 +32,7 @@ class PathSimilarity(
         return p.testResults.sortedByDescending { tc ->
 
             sumMatrix.filterKeys { it.testName == tc.name }
-                    .map { (priorities[it.key.fileName] ?: 0.0) * it.value.toDouble() }
+                    .map { (priorities[it.key.fileName] ?: 0.0) * it.value }
                     .sum()
         }
     }
