@@ -48,9 +48,8 @@ class DevaluationReducerTest {
         val reduced = reducer(m, n)
 
         expectThat(reduced).isEqualTo(
-                mapOf(
-                        Key("F1", "T1") to 4,
-                        Key("F1", "T2") to 5).toMatrix()
+            Matrix(mapOf(Key("F1", "T1") to 3.5,
+                    Key("F1", "T2") to 5.0))
         )
     }
 
