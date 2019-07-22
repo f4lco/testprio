@@ -23,10 +23,6 @@ dependencies {
     implementation("com.google.guava:guava:27.0.1-jre")
     implementation("org.neo4j.driver:neo4j-java-driver:1.7.2")
 
-    // Build from https://github.com/du-lab/nonnegative_matrix_factorization
-    // and install into Maven local repository
-    implementation("org.dulab:javanmf:1.0-SNAPSHOT")
-
     implementation("org.jooq:jooq:3.11.9")
     implementation("org.postgresql:postgresql:42.2.5.jre7")
 
