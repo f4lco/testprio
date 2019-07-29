@@ -54,7 +54,7 @@ class StrategyRunnerTest {
         val JOB_D2 = Job(buildNumber = 777, build = BUILD_D, jobNumber = 52, job = 8, begin = t15, end = t20)
     }
 
-    interface CloseableStrategy : PrioritisationStrategy, AutoCloseable
+    interface CloseableStrategy : PrioritizationStrategy, AutoCloseable
 
     private lateinit var runner: StrategyRunner
 
@@ -62,7 +62,7 @@ class StrategyRunnerTest {
     @Mock
     private lateinit var repository: Repository
     @Mock
-    private lateinit var strategy: PrioritisationStrategy
+    private lateinit var strategy: PrioritizationStrategy
 
     @BeforeEach
     fun setUp(@TempDir outputDirectory: File) {

@@ -3,7 +3,7 @@ package de.hpi.swa.testprio.strategy.matrix
 import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
-import de.hpi.swa.testprio.strategy.PrioritisationStrategy
+import de.hpi.swa.testprio.strategy.PrioritizationStrategy
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -21,7 +21,7 @@ class TestCaseFailureDistributionSimilarity(
     repository: Repository,
     cache: Cache,
     val reducer: Reducer
-) : PrioritisationStrategy {
+) : PrioritizationStrategy {
 
     private val unitMatrix = UnitMatrix(repository, cache)
 

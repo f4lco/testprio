@@ -7,7 +7,7 @@ import java.util.BitSet
 /**
  * Exercise test cases based on recently demonstrated fault effectiveness.
  */
-class RecentlyFailedStrategy(val alpha: Double) : PrioritisationStrategy {
+class RecentlyFailedStrategy(val alpha: Double) : PrioritizationStrategy {
 
     private val histories = mutableMapOf<String, BitSet>()
 

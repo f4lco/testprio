@@ -8,7 +8,7 @@ class Graph(
     graphHost: String,
     graphUser: String,
     graphPassword: String
-) : PrioritisationStrategy, AutoCloseable {
+) : PrioritizationStrategy, AutoCloseable {
 
     private val driver = GraphDatabase.driver(graphHost, AuthTokens.basic(graphUser, graphPassword))
     private val session = driver.session()
@@ -48,7 +48,7 @@ class Graph(
         }
 
         devalue()
-        // interesting: can the current prioritisation already know how the current files are connected?
+        // interesting: can the current prioritization already know how the current files are connected?
         createFileGraph(p.changedFiles)
         createTestNodes(p.testResults, p.changedFiles)
         return p.testResults.sortedByDescending { priorities[it] }

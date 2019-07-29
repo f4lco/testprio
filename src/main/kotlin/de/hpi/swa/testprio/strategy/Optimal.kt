@@ -6,7 +6,7 @@ import java.math.BigDecimal
 /**
  * Optimal strategies according to some criterion.
  */
-class Optimal private constructor(private val comparator: Comparator<TestResult>) : PrioritisationStrategy {
+class Optimal private constructor(private val comparator: Comparator<TestResult>) : PrioritizationStrategy {
 
     companion object {
 

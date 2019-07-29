@@ -20,7 +20,7 @@ class Params(
     val testResults: List<TestResult> by lazy { repository.testResults(job) }
 }
 
-interface PrioritisationStrategy {
+interface PrioritizationStrategy {
 
     fun reorder(p: Params): List<TestResult>
 
@@ -37,7 +37,7 @@ class StrategyRunner(val repository: Repository) {
 
     fun run(
         projectName: String,
-        strategy: PrioritisationStrategy,
+        strategy: PrioritizationStrategy,
         windowSize: Int?,
         output: File
     ) {
@@ -54,7 +54,7 @@ class StrategyRunner(val repository: Repository) {
         }
     }
 
-    private fun processBuilds(builds: Map<Int, List<Job>>, strategy: PrioritisationStrategy, windowSize: Int?) = sequence {
+    private fun processBuilds(builds: Map<Int, List<Job>>, strategy: PrioritizationStrategy, windowSize: Int?) = sequence {
         val pending = PriorityQueue<PendingBuild>(compareBy { it.end })
         val priorJobs = mutableListOf<Job>()
 
@@ -98,19 +98,19 @@ class StrategyRunner(val repository: Repository) {
         val end = jobs.map { it.end }.max()!!
     }
 
-    private fun processBuild(jobs: List<Job>, priorJobs: List<Job>, strategy: PrioritisationStrategy) = sequence {
+    private fun processBuild(jobs: List<Job>, priorJobs: List<Job>, strategy: PrioritizationStrategy) = sequence {
         for (job in jobs) {
             LOG.debug { "Reorder job $job" }
             yield(job to reorderJob(job, priorJobs, strategy))
         }
     }
 
-    private fun reorderJob(job: Job, priorJobs: List<Job>, strategy: PrioritisationStrategy): List<TestResult> {
+    private fun reorderJob(job: Job, priorJobs: List<Job>, strategy: PrioritizationStrategy): List<TestResult> {
         val params = newParams(job, priorJobs)
         return ensureIndexed(strategy.reorder(params))
     }
 
-    private fun advanceState(job: Job, priorJobs: List<Job>, strategy: PrioritisationStrategy) {
+    private fun advanceState(job: Job, priorJobs: List<Job>, strategy: PrioritizationStrategy) {
         val params = newParams(job, priorJobs)
         strategy.acceptFailedRun(params)
     }

@@ -4,11 +4,11 @@ import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Job
 import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
-import de.hpi.swa.testprio.strategy.PrioritisationStrategy
+import de.hpi.swa.testprio.strategy.PrioritizationStrategy
 import java.util.BitSet
 
 /**
- * Take "hot" and "cold" files into account during matrix prioritisation.
+ * Take "hot" and "cold" files into account during matrix prioritization.
  *
  * Assign weights to file failure distributions, such that tests connected
  * to recently changed files are ranked higher.
@@ -18,7 +18,7 @@ class RecentlyChanged(
     cache: Cache,
     val reducer: Reducer,
     val alpha: Double
-) : PrioritisationStrategy {
+) : PrioritizationStrategy {
 
     private val unitMatrix = UnitMatrix(repository, cache)
     private val histories = mutableMapOf<String, BitSet>()

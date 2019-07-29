@@ -11,7 +11,7 @@ import org.apache.commons.text.similarity.SimilarityScore
  * Given that _Foo_ changed, it might be good to prioritize _FooTest_ and _FooBarTest_, but not
  * _BarTest_.
  */
-class PathTestCaseOverlap(val similarity: SimilarityScore<Int> = LongestCommonSubsequence()) : PrioritisationStrategy {
+class PathTestCaseOverlap(val similarity: SimilarityScore<Int> = LongestCommonSubsequence()) : PrioritizationStrategy {
 
     private val nonWordChars = "\\W".toRegex()
 

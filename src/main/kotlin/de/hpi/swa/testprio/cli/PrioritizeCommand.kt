@@ -9,7 +9,7 @@ import com.github.ajalt.clikt.parameters.types.int
 import de.hpi.swa.testprio.probe.DatabaseRepository
 import de.hpi.swa.testprio.probe.Patches
 import de.hpi.swa.testprio.probe.Repository
-import de.hpi.swa.testprio.strategy.PrioritisationStrategy
+import de.hpi.swa.testprio.strategy.PrioritizationStrategy
 import de.hpi.swa.testprio.strategy.StrategyRunner
 
 abstract class PrioritizeCommand(name: String?, help: String = "") : DatabaseCommand(name = name, help = help) {
@@ -18,7 +18,7 @@ abstract class PrioritizeCommand(name: String?, help: String = "") : DatabaseCom
     val windowSize by option("--window").int()
     val output by option("--output").file(exists = false, folderOkay = false).required()
 
-    abstract fun strategy(repository: Repository): PrioritisationStrategy
+    abstract fun strategy(repository: Repository): PrioritizationStrategy
 
     override fun run() {
         makeContext().use {

@@ -7,7 +7,7 @@ import de.hpi.swa.testprio.parser.TestResult
  *
  * Newly inserted test cases are executed first.
  */
-class LeastRecentlyUsedStrategy : PrioritisationStrategy {
+class LeastRecentlyUsedStrategy : PrioritizationStrategy {
 
     private val lastOrder = mutableMapOf<String, Int>()
 

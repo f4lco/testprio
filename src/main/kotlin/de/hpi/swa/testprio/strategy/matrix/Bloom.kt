@@ -6,7 +6,7 @@ import com.google.common.hash.PrimitiveSink
 import de.hpi.swa.testprio.parser.TestResult
 import de.hpi.swa.testprio.probe.Repository
 import de.hpi.swa.testprio.strategy.Params
-import de.hpi.swa.testprio.strategy.PrioritisationStrategy
+import de.hpi.swa.testprio.strategy.PrioritizationStrategy
 import java.nio.charset.StandardCharsets
 import java.util.SortedSet
 import java.util.TreeSet
@@ -25,7 +25,7 @@ class Bloom(
     cache: Cache,
     val reducer: Reducer,
     val expectedInsertions: Int = 100
-) : PrioritisationStrategy {
+) : PrioritizationStrategy {
 
     private val unitMatrix = UnitMatrix(repository, cache)
     private val filters = mutableMapOf<String, BloomFilter<FileSet>>()

@@ -5,7 +5,7 @@ import kotlin.random.Random
 /**
  * Execute test cases in randomized order.
  */
-class RandomStrategy(seed: Int) : PrioritisationStrategy {
+class RandomStrategy(seed: Int) : PrioritizationStrategy {
 
     private val random = Random(seed)
 
