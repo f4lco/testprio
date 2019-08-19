@@ -13,20 +13,16 @@ class DevaluationReducer(val alpha: Double) : Reducer {
 
     override fun invoke(left: Matrix, right: Matrix): Matrix {
         val m = mutableMapOf<Key, Double>()
-        val newFiles = right.fileNames()
+        val commonFiles = left.fileNames.intersect(right.fileNames)
 
         for (entry in left) {
-            m[entry.key] = if (entry.key.fileName in newFiles) {
-                ((1 - alpha) * entry.value)
-            } else entry.value
+            val factor = if (entry.key.fileName in commonFiles) (1 - alpha) else 1.0
+            m[entry.key] = factor * entry.value
         }
 
         for (entry in right) {
-            if (entry.key in left) {
-                m.merge(entry.key, alpha * entry.value, Double::plus)
-            } else {
-                m[entry.key] = entry.value
-            }
+            val factor = if (entry.key.fileName in commonFiles) alpha else 1.0
+            m.merge(entry.key, factor * entry.value, Double::plus)
         }
 
         return Matrix(m)

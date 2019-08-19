@@ -53,6 +53,21 @@ class DevaluationReducerTest {
         )
     }
 
+    @Test
+    fun addedTestCase() {
+        val m = mapOf(Key("F1", "T1") to 1).toMatrix()
+        val n = mapOf(
+                Key("F1", "T1") to 1,
+                Key("F1", "T2") to 2).toMatrix()
+
+        val reduced = reducer(m, n)
+
+        expectThat(reduced).isEqualTo(mapOf(
+                Key("F1", "T1") to 1,
+                Key("F1", "T2") to 1
+        ).toMatrix())
+    }
+
     private fun Map<Key, Int>.toMatrix() = Matrix(this.mapValues { it.value.toDouble() })
 
     @Test
