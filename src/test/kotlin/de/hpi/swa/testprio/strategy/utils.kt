@@ -26,21 +26,21 @@ fun Matrix.print() {
     print(tableString())
 }
 
-fun Matrix.tableString(n: Int = 4): String = StringBuilder(128).apply {
+fun Matrix.tableString(n: Int = 6): String = StringBuilder(128).apply {
     val tc = keys.map { it.testName }.toSortedSet()
 
     append(" ".repeat(n))
     for (name in tc) {
-        append(name.padEnd(n))
+        append(name.padStart(n))
     }
     appendln()
 
     val files = keys.map { it.fileName }.toSortedSet()
     for (name in files) {
-        append(name.padEnd(n))
+        append(name.padStart(n))
         for (t in tc) {
-            val value = this@tableString[Key(name, t)] ?: 0
-            append(value.toString().padEnd(n))
+            val value = this@tableString[Key(name, t)] ?: 0.0
+            append("%.2f".format(value).padStart(n))
         }
         appendln()
     }
